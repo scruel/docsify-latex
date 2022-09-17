@@ -32,8 +32,15 @@ function unescapeRegexEscape(regexStr) {
   return regexStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+function getcommentReplaceMarkedText(text){
+  return `<!-- ${commentReplaceMark} ${text} -->`;
+}
+
 // Math Render Init
 // =============================================================================
+const commentReplaceMark = 'latex:replace';
+const commentReplaceDollarMark = getcommentReplaceMarkedText('ESCAPEDOLLAR');
+
 let hasMathjax = (typeof MathJax !== 'undefined' && MathJax);
 const hasKatex = (typeof katex !== 'undefined' && katex);
 
@@ -79,9 +86,6 @@ if (hasMathjax) {
   }
 }
 
-const commentReplaceMark = 'latex:replace';
-const commentReplaceDollarMark = `<!-- ${commentReplaceMark} ESCAPEDOLLAR -->`;
-
 const regex = {
   escapeDollarMarkup: /(\\\$)/g,
 
@@ -96,9 +100,8 @@ const regex = {
   // Matches replacement comment
   // 0: Match
   // 1: Replacement HTML
-  commentReplaceMarkup: new RegExp(`<!-- ${commentReplaceMark} ([\\s\\S]*?) -->`),
+  commentReplaceMarkup: new RegExp(`<!-- ${commentReplaceMark} (.*?) -->`),
   commentReplaceDollarMarkup: new RegExp(commentReplaceDollarMark),
-
 };
 
 async function renderMathContent(content, isInline) {
@@ -130,24 +133,26 @@ function matchMathBlock(content) {
   let isInline = false;
   for (const mathBlockArray of settings.displayMath) {
     const mathRegex = getRegexMarkup(mathBlockArray[0], mathBlockArray[1], isInline);
-    let result = content.match(mathRegex);
+    const result = content.match(mathRegex);
     if (result) {
-      result = result.concat(isInline);
-      result = result.concat(mathRegex);
+      result.inline = isInline;
+      result.regex = mathRegex;
       return result;
     }
   }
   isInline = true;
   for (const mathBlockArray of settings.inlineMath) {
     const mathRegex = getRegexMarkup(mathBlockArray[0], mathBlockArray[1], isInline);
-    let result = content.match(mathRegex);
+    const result = content.match(mathRegex);
     if (result) {
-      result = result.concat(isInline);
-      result = result.concat(mathRegex);
+      result.inline = isInline;
+      result.regex = mathRegex;
       return result;
     }
   }
+  return null;
 }
+
 /**
  * Converts LaTeX content into "stage 1" markup. Stage 1 markup contains temporary
  * comments which are replaced with HTML during Stage 2. This approach allows
@@ -172,27 +177,26 @@ async function renderStage1(content) {
 
   const codeBlockMatch = content.match(regex.codeBlockMarkup) || [];
   const codeBlockMarkers = codeBlockMatch.map((item, i) => {
-    const codeMarker = `<!-- ${commentReplaceMark} CODEBLOCK${i} -->`;
+    const codeMarker = getcommentReplaceMarkedText(`CODEBLOCK${i}`);
     content = content.replace(item, () => codeMarker);
     return codeMarker;
   });
   const codeInlineMatch = content.match(regex.codeInlineMarkup) || [];
   const codeInlineMarkers = codeBlockMatch.map((item, i) => {
-    const codeMarker = `<!-- ${commentReplaceMark} CODEINLINE${i} -->`;
+    const codeMarker = getcommentReplaceMarkedText(`CODEINLINE${i}`);
     content = content.replace(item, () => codeMarker);
     return codeMarker;
   });
 
   // Render math blocks
-  let mathMatch = matchMathBlock(content);
-  while (mathMatch) {
-    if ('' === mathMatch[0]) {
+  let contentMatch;
+  while ((contentMatch = matchMathBlock(content)) !== null) {
+    if ('' === contentMatch[0]) {
       throw new Error('Wrong regex match rule, please check!');
     }
-    const mathBlockOut = await renderMathContent(mathMatch[0], mathMatch[2]);
-    const mathBlockOutReplacement = `<!-- ${commentReplaceMark} ${window.btoa(encodeURIComponent(mathBlockOut))} -->`;
-    content = content.replace(mathMatch[0], () => mathBlockOutReplacement);
-    mathMatch = matchMathBlock(content);
+    const mathBlockOut = await renderMathContent(contentMatch[0], contentMatch.inline);
+    const mathBlockOutReplacement = getcommentReplaceMarkedText(window.btoa(encodeURIComponent(mathBlockOut)));
+    content = content.replace(contentMatch[0], () => mathBlockOutReplacement);
   }
 
   // Unprotect content - restore code blocks
