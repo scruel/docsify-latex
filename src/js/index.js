@@ -39,6 +39,7 @@ function getcommentReplaceMarkedText(text){
 // Math Render Init
 // =============================================================================
 const commentReplaceMark = 'latex:replace';
+const quoteStartWithCommentReplaceMark = 'latex:delete';
 const commentReplaceDollarMark = getcommentReplaceMarkedText('ESCAPEDOLLAR');
 
 let hasMathjax = (typeof MathJax !== 'undefined' && MathJax);
@@ -102,6 +103,7 @@ const regex = {
   // 1: Replacement HTML
   commentReplaceMarkup: new RegExp(`<!-- ${commentReplaceMark} (.*?) -->`),
   commentReplaceDollarMarkup: new RegExp(commentReplaceDollarMark),
+  quoteStartWithCommentMarkup: /^>([ ]*)<!--/m
 };
 
 async function renderMathContent(content, isInline) {
@@ -206,6 +208,12 @@ async function renderStage1(content) {
   codeInlineMarkers.forEach((item, i) => {
     content = content.replace(item, () => codeInlineMatch[i]);
   });
+
+  // Temporary work around for docsify issue
+  while ((contentMatch = content.match(regex.quoteStartWithCommentMarkup)) !== null){
+    const quoteText = contentMatch[1];
+    content = content.replace(contentMatch[0], () => `>${quoteText}${quoteStartWithCommentReplaceMark}<!--`);
+  }
   return content;
 }
 
@@ -218,6 +226,9 @@ async function renderStage1(content) {
  */
 function renderStage2(html) {
   let mathReplaceMatch;
+
+  // Temporary work around for docsify issue
+  html = html.replaceAll(quoteStartWithCommentReplaceMark, '');
 
   // Temporary work around for docsify issue:
   // https://github.com/docsifyjs/docsify/issues/1881
