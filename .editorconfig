@@ -12,7 +12,6 @@ insert_final_newline = true
 max_line_length = 120
 
 [*.md]
-insert_final_newline = false
 trim_trailing_whitespace = false
 
 [{*.json}]
