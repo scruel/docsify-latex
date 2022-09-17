@@ -1,0 +1,19 @@
+# two indent
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+tab_width = 2
+indent_size = 2
+indent_style = space
+trim_trailing_whitespace = true
+insert_final_newline = true
+max_line_length = 120
+
+[*.md]
+insert_final_newline = false
+trim_trailing_whitespace = false
+
+[{*.json}]
+max_line_length = off
