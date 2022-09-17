@@ -1,6 +1,6 @@
 {
   "name": "docsify-latex",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A docsify.js plugin for rendering LaTeX math blocks from markdown",
   "author": "Scruel Tao",
   "license": "MIT",
