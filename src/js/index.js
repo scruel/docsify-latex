@@ -60,8 +60,9 @@ if (hasMathjax) {
             MathJax.typesetPromise((() => {
               return [mathbox];
             })()
-            );
-            resolve();
+            ).then(() => {
+              resolve();
+            });
           })
           .catch((err) => {
             console.log('Typeset failed: ' + err.message);
@@ -107,11 +108,11 @@ const regex = {
   commentReplaceDollarMarkup: new RegExp(commentReplaceDollarMark),
 };
 
-async function renderMathContent(content, isInline) {
+async function renderMathContent(content, latex, isInline) {
   if (hasMathjax) {
     return await MathJax.renderToStringAsync(content);
   } else if (hasKatex) {
-    return katex.renderToString(content, {
+    return katex.renderToString(latex, {
       throwOnError: false,
       displayMode: !isInline,
     });
@@ -126,10 +127,10 @@ function getRegexMarkup(matchStartRegex, matchEndRegex, isInline) {
   matchEndRegex = unescapeRegexEscape(matchEndRegex);
   // Matches markdown inline math
   if (isInline) {
-    return new RegExp(`(?<=^|(?:[^\\\\]))${matchStartRegex}(.*?)[^\\\\]?${matchEndRegex}`);
+    return new RegExp(`(?<=^|(?:[^\\\\]))${matchStartRegex}(.*?[^\\\\]?)${matchEndRegex}`);
   }
   // Matches markdown math blocks
-  return new RegExp(`(?<=^|(?:[^\\\\]))${matchStartRegex}([\\s\\S]*?)[^\\\\]?${matchEndRegex}`, 'm');
+  return new RegExp(`(?<=^|(?:[^\\\\]))${matchStartRegex}([\\s\\S]*?[^\\\\]?)${matchEndRegex}`, 'm');
 }
 
 function matchMathBlock(content) {
@@ -197,7 +198,7 @@ async function renderStage1(content) {
     if ('' === contentMatch[0]) {
       throw new Error('Wrong regex match rule, please check!');
     }
-    const mathBlockOut = await renderMathContent(contentMatch[0], contentMatch.inline);
+    const mathBlockOut = await renderMathContent(contentMatch[0], contentMatch[1], contentMatch.inline);
     const mathBlockOutReplacement = getcommentReplaceMarkedText(window.btoa(encodeURIComponent(mathBlockOut)));
     content = content.replace(contentMatch[0], () => mathBlockOutReplacement);
   }
