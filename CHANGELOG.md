@@ -1,11 +1,10 @@
 # Change Log
 
-## 0.0.2 - 0.0.3
+## 0.0.2 - 0.0.4
 
 *2022-09-17*
 
-- Fix line breaks
-- Code refactor
+- Code refactor & Fixes
 
 ## 0.0.1
 
