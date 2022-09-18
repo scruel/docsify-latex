@@ -2,12 +2,38 @@
 // =============================================================================
 import { version as pkgVersion } from '../../package.json';
 
+// Base Tool Functions
+// =============================================================================
+function unescapeRegexEscape(regexStr) {
+  return regexStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function getcommentReplaceMarkedText(text) {
+  return `<!-- ${commentReplaceMark} ${text} -->`;
+}
+
+// Deep cover an object, for every keys in sourceObj, replce the value of targetObj
+// if its key exists, or put key&value into targetObj if not exists.
+function coverObject(sourceObj, targetObj) {
+  Object.keys(sourceObj).forEach(key => {
+    if (!Object.prototype.hasOwnProperty.call(targetObj, key)) {
+      targetObj[key] = sourceObj[key];
+      return;
+    }
+    if (Object.prototype.toString.call(sourceObj[key]) !== '[object Object]') {
+      targetObj[key] = sourceObj[key];
+      return;
+    }
+    coverObject(sourceObj[key], targetObj[key]);
+  });
+}
 
 // Constants and variables
 // =============================================================================
 const settings = {
   inlineMath: [['$', '$'], ['\\(', '\\)']],
   displayMath: [['$$', '$$']],
+  customOptions: {}
 };
 
 if (window) {
@@ -17,23 +43,9 @@ if (window) {
   window.$docsify.latex = window.$docsify.latex || {};
 
   // Update settings based on $docsify config
-  Object.keys(window.$docsify.latex).forEach(key => {
-    if (Object.prototype.hasOwnProperty.call(settings, key)) {
-      settings[key] = window.$docsify.latex[key];
-    }
-  });
-
+  coverObject(window.$docsify.latex, settings);
   // Add plugin data
   window.$docsify.latex.version = pkgVersion;
-}
-// Base Tool Functions
-// =============================================================================
-function unescapeRegexEscape(regexStr) {
-  return regexStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-function getcommentReplaceMarkedText(text) {
-  return `<!-- ${commentReplaceMark} ${text} -->`;
 }
 
 // Math Render Init
@@ -48,26 +60,35 @@ let hasMathJax = (typeof MathJax !== 'undefined' && MathJax);
 const hasKatex = (typeof katex !== 'undefined' && katex);
 
 if (hasMathJax) {
+  // MathJax configs and functions init
   MathJax.renderToString = (content) => {
     return `<${latexContainerTagName}>${content}</${latexContainerTagName}>`;
   };
   if (MathJax.version[0] === '3') {
+    coverObject(settings.customOptions, MathJax.config);
+    // Prevent inconsistency render symbol problem
     MathJax.config.tex.inlineMath = settings.inlineMath;
     MathJax.config.tex.displayMath = settings.displayMath;
     MathJax.startup.getComponents();
+
     MathJax.renderElement = (mathbox) => {
       MathJax.typesetPromise([mathbox]);
     };
   } else if (MathJax.version[0] === '2') {
-    MathJax.Hub.Config({
+    const options = {
+      skipStartupTypeset: true,
+      messageStyle: 'none'
+    };
+    coverObject(settings.customOptions, options);
+    // Prevent inconsistency render symbol problem
+    coverObject({
       tex2jax: {
         inlineMath: settings.inlineMath,
         displayMath: settings.displayMath
-      },
-      skipStartupTypeset: true,
-      messageStyle: 'none'
-    });
-    MathJax.Hub.processUpdateDelay = 0;
+      }
+    }, options);
+    MathJax.Hub.Config(options);
+    MathJax.Hub.processSectionDelay = 0;
     MathJax.Hub.processUpdateDelay = 0;
 
     MathJax.renderElement = (mathbox) => {
@@ -105,10 +126,12 @@ function renderMathContent(content, latex, isInline) {
   if (hasMathJax) {
     return MathJax.renderToString(content);
   } else if (hasKatex) {
-    return katex.renderToString(latex, {
-      throwOnError: false,
-      displayMode: !isInline,
-    });
+    const options = {
+      throwOnError: false
+    };
+    coverObject(settings.customOptions, options);
+    options.displayMode = !isInline;
+    return katex.renderToString(latex, options);
   } else {
     return content;
   }
