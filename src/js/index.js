@@ -42,34 +42,21 @@ const commentReplaceMark = 'latex:replace';
 const deleteReplaceMark = 'latex:delete';
 const commentReplaceDollarMark = getcommentReplaceMarkedText('ESCAPEDOLLAR');
 
-let hasMathjax = (typeof MathJax !== 'undefined' && MathJax);
+const latexContainerTagName = 'docsify-latex';
+
+let hasMathJax = (typeof MathJax !== 'undefined' && MathJax);
 const hasKatex = (typeof katex !== 'undefined' && katex);
 
-if (hasMathjax) {
+if (hasMathJax) {
+  MathJax.renderToString = (content) => {
+    return `<${latexContainerTagName}>${content}</${latexContainerTagName}>`;
+  };
   if (MathJax.version[0] === '3') {
     MathJax.config.tex.inlineMath = settings.inlineMath;
     MathJax.config.tex.displayMath = settings.displayMath;
     MathJax.startup.getComponents();
-
-    MathJax.renderToStringAsync = async (content) => {
-      const mathbox = document.createElement('div');
-      mathbox.innerHTML = content;
-      await new Promise((resolve, reject) => {
-        MathJax.startup.promise
-          .then(() => {
-            MathJax.typesetPromise((() => {
-              return [mathbox];
-            })()
-            ).then(() => {
-              resolve();
-            });
-          })
-          .catch((err) => {
-            console.log('Typeset failed: ' + err.message);
-            reject(err);
-          });
-      });
-      return mathbox.innerHTML;
+    MathJax.renderElement = (mathbox) => {
+      MathJax.typesetPromise([mathbox]);
     };
   } else if (MathJax.version[0] === '2') {
     MathJax.Hub.Config({
@@ -77,14 +64,20 @@ if (hasMathjax) {
         inlineMath: settings.inlineMath,
         displayMath: settings.displayMath
       },
+      skipStartupTypeset: true,
       messageStyle: 'none'
     });
     MathJax.Hub.processUpdateDelay = 0;
-    // Just let MathJax itself render the page :)
-    hasMathjax = false;
+    MathJax.Hub.processUpdateDelay = 0;
+
+    MathJax.renderElement = (mathbox) => {
+      MathJax.Hub.Queue(
+        ['Typeset', MathJax.Hub, mathbox],
+      );
+    };
   }
   else {
-    hasMathjax = false;
+    hasMathJax = false;
   }
 }
 
@@ -108,9 +101,9 @@ const regex = {
   commentReplaceDollarMarkup: new RegExp(commentReplaceDollarMark),
 };
 
-async function renderMathContent(content, latex, isInline) {
-  if (hasMathjax) {
-    return await MathJax.renderToStringAsync(content);
+function renderMathContent(content, latex, isInline) {
+  if (hasMathJax) {
+    return MathJax.renderToString(content);
   } else if (hasKatex) {
     return katex.renderToString(latex, {
       throwOnError: false,
@@ -165,7 +158,7 @@ function matchMathBlock(content) {
  * @param {string} content
  * @returns {string}
  */
-async function renderStage1(content) {
+function renderStage1(content) {
   // Protect content:
   // Replace escaped char with marker to prevent wrong regex match.
   // Replace code block with marker to ensure LaTeX markup within code
@@ -198,7 +191,7 @@ async function renderStage1(content) {
     if ('' === contentMatch[0]) {
       throw new Error('Wrong regex match rule, please check!');
     }
-    const mathBlockOut = await renderMathContent(contentMatch[0], contentMatch[1], contentMatch.inline);
+    const mathBlockOut = renderMathContent(contentMatch[0], contentMatch[1], contentMatch.inline);
     const mathBlockOutReplacement = getcommentReplaceMarkedText(window.btoa(encodeURIComponent(mathBlockOut)));
     content = content.replace(contentMatch[0], () => mathBlockOutReplacement);
   }
@@ -235,6 +228,7 @@ function renderStage2(html) {
     html = html.replace(mathComment, () => mathReplacement);
   }
 
+  // Restore all commented elements
   while ((mathReplaceMatch = regex.commentReplaceMarkup.exec(html)) !== null) {
     const mathComment = mathReplaceMatch[0];
     const mathReplacement = mathReplaceMatch[1] || '';
@@ -243,18 +237,32 @@ function renderStage2(html) {
   return html;
 }
 
+function renderStage3() {
+  // Perform remain actions to latex elements
+  if (hasMathJax) {
+    const mathElements =  document.getElementsByTagName(latexContainerTagName);
+    for (const mathbox of mathElements) {
+      MathJax.renderElement(mathbox);
+    }
+  }
+}
+
 // Plugin
 // =============================================================================
 function initLatex(hook, vm) {
-  hook.beforeEach(async function (content, next) {
-    content = await renderStage1(content);
+  hook.beforeEach(function (content, next) {
+    content = renderStage1(content);
     next(content);
   });
 
-  hook.afterEach(async function (html, next) {
+  hook.afterEach(function (html, next) {
     html = renderStage2(html);
     next(html);
   });
+  hook.doneEach(function() {
+    renderStage3();
+  });
+
 }
 
 if (window) {
