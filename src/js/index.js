@@ -107,11 +107,11 @@ const regex = {
 
   // Matches markdown inline code
   // Example: `text`
-  codeInlineMarkup: /((?!\\)`[\s\S]*?(?!\\)`)/g,
+  codeInlineMarkup: new RegExp('(?<=[^\\\\]|^)(`.*?(?<=[^\\\\])`)', 'g'),
 
   // Matches markdown code blocks (inline and multi-line)
   // Example: ```text```
-  codeBlockMarkup: /((?!\\)```[\s\S]*?(?!\\)```)/gm,
+  codeBlockMarkup: new RegExp('(?<=[^\\\\]|^)(```[\\s\\S]*?(?<=[^\\\\])```)', 'gm'),
 
   commentDeleteReplaceMarkup: /^(>?[ ]*)<!--/gm,
 
@@ -129,6 +129,7 @@ function renderMathContent(content, latex, isInline) {
     const options = {
       throwOnError: false
     };
+
     coverObject(settings.customOptions, options);
     options.displayMode = !isInline;
     return katex.renderToString(latex, options);
@@ -143,10 +144,10 @@ function getRegexMarkup(matchStartRegex, matchEndRegex, isInline) {
   matchEndRegex = unescapeRegexEscape(matchEndRegex);
   // Matches markdown inline math
   if (isInline) {
-    return new RegExp(`(?<=^|(?:[^\\\\]))${matchStartRegex}(.*?[^\\\\]?)${matchEndRegex}`);
+    return new RegExp(`(?<=[^\\\\]|^)${matchStartRegex}(.*?(?<=[^\\\\]))${matchEndRegex}`);
   }
   // Matches markdown math blocks
-  return new RegExp(`(?<=^|(?:[^\\\\]))${matchStartRegex}([\\s\\S]*?[^\\\\]?)${matchEndRegex}`, 'm');
+  return new RegExp(`(?<=[^\\\\]|^)${matchStartRegex}([\\s\\S]*?(?<=[^\\\\]))${matchEndRegex}`, 'm');
 }
 
 function matchMathBlock(content) {
@@ -202,7 +203,7 @@ function renderStage1(content) {
     return codeMarker;
   });
   const codeInlineMatch = content.match(regex.codeInlineMarkup) || [];
-  const codeInlineMarkers = codeBlockMatch.map((item, i) => {
+  const codeInlineMarkers = codeInlineMatch.map((item, i) => {
     const codeMarker = getcommentReplaceMarkedText(`CODEINLINE${i}`);
     content = content.replace(item, () => codeMarker);
     return codeMarker;
