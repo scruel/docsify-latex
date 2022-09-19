@@ -1,10 +1,11 @@
 # Change Log
 
-## 0.1.0
+## 0.1.1
 
 *2022-09-18*
 
 - Support custom options
+- Code refactor & Fixes
 
 ## 0.0.2 - 0.0.5
 
