@@ -107,11 +107,11 @@ const regex = {
 
   // Matches markdown inline code
   // Example: `text`
-  codeInlineMarkup: new RegExp('(?<=[^\\\\]|^)(`.*?(?<=[^\\\\])`)', 'g'),
+  codeInlineMarkup: new RegExp('(?<=[^\\\\]|^)(`.*?(?<=[^\\\\])`)'),
 
   // Matches markdown code blocks (inline and multi-line)
   // Example: ```text```
-  codeBlockMarkup: new RegExp('(?<=[^\\\\]|^)(```[\\s\\S]*?(?<=[^\\\\])```)', 'gm'),
+  codeBlockMarkup: new RegExp('(?<=[^\\\\]|^)(```[\\s\\S]*?(?<=[^\\\\])```)', 'm'),
 
   commentDeleteReplaceMarkup: /^(>?[ ]*)<!--/gm,
 
@@ -190,44 +190,45 @@ function renderStage1(content) {
   // These markers are replaced with their associated code blocs after
   // blocks have been processed.
   // WARN: Do not change the order of matches!
-
+  let contentMatch;
   const escapeMatch = content.match(regex.escapeDollarMarkup) || [];
   escapeMatch.forEach((item) => {
     content = content.replace(item, () => commentReplaceDollarMark);
   });
-
-  const codeBlockMatch = content.match(regex.codeBlockMarkup) || [];
-  const codeBlockMarkers = codeBlockMatch.map((item, i) => {
-    const codeMarker = getcommentReplaceMarkedText(`CODEBLOCK${i}`);
-    content = content.replace(item, () => codeMarker);
-    return codeMarker;
-  });
-  const codeInlineMatch = content.match(regex.codeInlineMarkup) || [];
-  const codeInlineMarkers = codeInlineMatch.map((item, i) => {
-    const codeMarker = getcommentReplaceMarkedText(`CODEINLINE${i}`);
-    content = content.replace(item, () => codeMarker);
-    return codeMarker;
-  });
+  const codeMatchList = [];
+  const codeMarkerList = [];
+  while ((contentMatch = content.match(regex.codeBlockMarkup)) !== null) {
+    const matchLength = contentMatch[0].length;
+    const codeBlock = content.substring(contentMatch.index, contentMatch.index + matchLength);
+    const idx = codeMatchList.push(codeBlock);
+    const codeMarker = getcommentReplaceMarkedText(`CODEBLOCK${idx}`);
+    codeMarkerList.push(codeMarker);
+    content = content.substring(0, contentMatch.index) + codeMarker
+      + content.substring(contentMatch.index + matchLength, content.length);
+  }
+  while ((contentMatch = content.match(regex.codeInlineMarkup)) !== null) {
+    const matchLength = contentMatch[0].length;
+    const codeBlock = content.substring(contentMatch.index, contentMatch.index + matchLength);
+    const idx = codeMatchList.push(codeBlock);
+    const codeMarker = getcommentReplaceMarkedText(`CODEINLINE${idx}`);
+    codeMarkerList.push(codeMarker);
+    content = content.substring(0, contentMatch.index) + codeMarker
+      + content.substring(contentMatch.index + matchLength, content.length);
+  }
 
   // Render math blocks
-  let contentMatch;
   while ((contentMatch = matchMathBlock(content)) !== null) {
-    if ('' === contentMatch[0]) {
-      throw new Error('Wrong regex match rule, please check!');
-    }
+    const matchLength = contentMatch[0].length;
     const mathBlockOut = renderMathContent(contentMatch[0], contentMatch[1], contentMatch.inline);
     const mathBlockOutReplacement = getcommentReplaceMarkedText(window.btoa(encodeURIComponent(mathBlockOut)));
-    content = content.replace(contentMatch[0], () => mathBlockOutReplacement);
+    content = content.substring(0, contentMatch.index) + mathBlockOutReplacement
+      + content.substring(contentMatch.index + matchLength, content.length);
   }
 
   // Unprotect content - restore code blocks
-  codeBlockMarkers.forEach((item, i) => {
-    content = content.replace(item, () => codeBlockMatch[i]);
+  codeMarkerList.forEach((item, i) => {
+    content = content.replace(item, () => codeMatchList[i]);
   });
-  codeInlineMarkers.forEach((item, i) => {
-    content = content.replace(item, () => codeInlineMatch[i]);
-  });
-
   // Ensure docsify can render line breaks by itself, rather than ignore empty lines.
   content = content.replaceAll(regex.commentDeleteReplaceMarkup, `$1${deleteReplaceMark}<!--`);
   return content;
