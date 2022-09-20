@@ -108,14 +108,13 @@ else if (hasKatex) {
 
 const regex = {
   escapeDollarMarkup: /(\\\$)/g,
+  // Matches markdown code blocks (inline and multi-line)
+  // Example: ```CODE```
+  codeBlockMarkup: new RegExp('(?<=[^\\\\]|^)(```[\\s\\S]*?(?<=[^\\\\])```)', 'm'),
 
   // Matches markdown inline code
-  // Example: `text`
+  // Example: `CODE`
   codeInlineMarkup: new RegExp('(?<=[^\\\\]|^)(`.*?(?<=[^\\\\])`)'),
-
-  // Matches markdown code blocks (inline and multi-line)
-  // Example: ```text```
-  codeBlockMarkup: new RegExp('(?<=[^\\\\]|^)(```[\\s\\S]*?(?<=[^\\\\])```)', 'm'),
 
   commentDeleteReplaceMarkup: /^(>?[ ]*)<!--/gm,
 
@@ -182,7 +181,16 @@ function matchMathBlock(content) {
   }
   return null;
 }
-
+function codeMatchReplacedConent(content, contentMatch, replaceMark, codeMatchList, codeMarkerList) {
+  const matchLength = contentMatch[0].length;
+  const codeBlock = content.substring(contentMatch.index, contentMatch.index + matchLength);
+  const idx = codeMatchList.push(codeBlock);
+  const codeMarker = getcommentReplaceMarkedText(`${replaceMark}${idx}`);
+  codeMarkerList.push(codeMarker);
+  content = content.substring(0, contentMatch.index) + codeMarker
+    + content.substring(contentMatch.index + matchLength, content.length);
+  return content;
+}
 /**
  * Converts LaTeX content into "stage 1" markup. Stage 1 markup contains temporary
  * comments which are replaced with HTML during Stage 2. This approach allows
@@ -207,22 +215,10 @@ function renderStage1(content) {
   const codeMatchList = [];
   const codeMarkerList = [];
   while ((contentMatch = content.match(regex.codeBlockMarkup)) !== null) {
-    const matchLength = contentMatch[0].length;
-    const codeBlock = content.substring(contentMatch.index, contentMatch.index + matchLength);
-    const idx = codeMatchList.push(codeBlock);
-    const codeMarker = getcommentReplaceMarkedText(`CODEBLOCK${idx}`);
-    codeMarkerList.push(codeMarker);
-    content = content.substring(0, contentMatch.index) + codeMarker
-      + content.substring(contentMatch.index + matchLength, content.length);
+    content = codeMatchReplacedConent(content, contentMatch, 'CODEBLOCK', codeMatchList, codeMarkerList);
   }
   while ((contentMatch = content.match(regex.codeInlineMarkup)) !== null) {
-    const matchLength = contentMatch[0].length;
-    const codeBlock = content.substring(contentMatch.index, contentMatch.index + matchLength);
-    const idx = codeMatchList.push(codeBlock);
-    const codeMarker = getcommentReplaceMarkedText(`CODEINLINE${idx}`);
-    codeMarkerList.push(codeMarker);
-    content = content.substring(0, contentMatch.index) + codeMarker
-      + content.substring(contentMatch.index + matchLength, content.length);
+    content = codeMatchReplacedConent(content, contentMatch, 'CODEINLINE', codeMatchList, codeMarkerList);
   }
 
   // Render math blocks
