@@ -108,6 +108,11 @@ else if (hasKatex) {
 
 const regex = {
   escapeDollarMarkup: /(\\\$)/g,
+
+  // Matches html code blocks (inline and multi-line)
+  // Example: <code>CODE</code>
+  codeTagMarkup: new RegExp('(?<=[^\\\\]|^)(<code>[\\s\\S]*?(?<=[^\\\\])</code>)', 'm'),
+
   // Matches markdown code blocks (inline and multi-line)
   // Example: ```CODE```
   codeBlockMarkup: new RegExp('(?<=[^\\\\]|^)(```[\\s\\S]*?(?<=[^\\\\])```)', 'm'),
@@ -214,6 +219,9 @@ function renderStage1(content) {
   });
   const codeMatchList = [];
   const codeMarkerList = [];
+  while ((contentMatch = content.match(regex.codeTagMarkup)) !== null) {
+    content = codeMatchReplacedConent(content, contentMatch, 'CODETAG', codeMatchList, codeMarkerList);
+  }
   while ((contentMatch = content.match(regex.codeBlockMarkup)) !== null) {
     content = codeMatchReplacedConent(content, contentMatch, 'CODEBLOCK', codeMatchList, codeMarkerList);
   }
