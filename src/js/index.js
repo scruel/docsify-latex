@@ -101,6 +101,10 @@ if (hasMathJax) {
     hasMathJax = false;
   }
 }
+else if (hasKatex) {
+  // pass
+}
+
 
 const regex = {
   escapeDollarMarkup: /(\\\$)/g,
@@ -122,6 +126,8 @@ const regex = {
   commentReplaceDollarMarkup: new RegExp(commentReplaceDollarMark),
 };
 
+// Math Render functions
+// =============================================================================
 function renderMathContent(content, latex, isInline) {
   if (hasMathJax) {
     return MathJax.renderToString(content);
@@ -129,9 +135,9 @@ function renderMathContent(content, latex, isInline) {
     const options = {
       throwOnError: false
     };
-
     coverObject(settings.customOptions, options);
     options.displayMode = !isInline;
+
     return katex.renderToString(latex, options);
   } else {
     return content;
@@ -150,24 +156,27 @@ function getRegexMarkup(matchStartRegex, matchEndRegex, isInline) {
   return new RegExp(`(?<=[^\\\\]|^)${matchStartRegex}([\\s\\S]*?(?<=[^\\\\]))${matchEndRegex}`, 'm');
 }
 
+function matchMathBlockRegex(content, regexGroup, isInline){
+  const mathRegex = getRegexMarkup(regexGroup[0], regexGroup[1], isInline);
+  const result = content.match(mathRegex);
+  if (result) {
+    result.inline = isInline;
+    result.regex = mathRegex;
+    return result;
+  }
+  return null;
+}
+
 function matchMathBlock(content) {
-  let isInline = false;
-  for (const mathBlockArray of settings.displayMath) {
-    const mathRegex = getRegexMarkup(mathBlockArray[0], mathBlockArray[1], isInline);
-    const result = content.match(mathRegex);
+  for (const regexGroup of settings.displayMath) {
+    const result = matchMathBlockRegex(content, regexGroup, false);
     if (result) {
-      result.inline = isInline;
-      result.regex = mathRegex;
       return result;
     }
   }
-  isInline = true;
-  for (const mathBlockArray of settings.inlineMath) {
-    const mathRegex = getRegexMarkup(mathBlockArray[0], mathBlockArray[1], isInline);
-    const result = content.match(mathRegex);
+  for (const regexGroup of settings.inlineMath) {
+    const result = matchMathBlockRegex(content, regexGroup, true);
     if (result) {
-      result.inline = isInline;
-      result.regex = mathRegex;
       return result;
     }
   }
