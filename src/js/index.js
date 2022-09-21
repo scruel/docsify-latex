@@ -56,7 +56,6 @@ if (window) {
 // =============================================================================
 const commentReplaceMark = 'latex:replace';
 const deleteReplaceMark = 'latex:delete';
-const commentReplaceDollarMark = getCommentReplaceMarkedText('ESCAPEDOLLAR');
 
 const latexContainerTagName = 'docsify-latex';
 
@@ -131,8 +130,6 @@ function getBlockRegex(matchStartRegex, matchEndRegex, needMatchMultipleLine) {
 const codePlaceholder = 'CODE';
 
 const regex = {
-  escapeDollarMarkup: /(\\\$)/g,
-
   // Matches html code blocks (inline and multi-line)
   // Example: <code>CODE</code>
   codeTagMarkup: getBlockRegex('<code>', '</code>', true),
@@ -148,8 +145,7 @@ const regex = {
   commentDeleteReplaceMarkup: /^(>?[ ]*)<!--/gm,
 
   commentReplaceMarkup: getCommentReplaceMarkupRegex(),
-  commentCodeReplaceMarkup: getCommentReplaceMarkupRegex(codePlaceholder),
-  commentReplaceDollarMarkup: new RegExp(commentReplaceDollarMark),
+  commentCodeReplaceMarkup: getCommentReplaceMarkupRegex(codePlaceholder)
 };
 
 // Math Render functions
@@ -227,18 +223,13 @@ function matchReplacedConent(content, contentMatch, matchIndexForReplace, placeh
  * @returns {string}
  */
 function renderStage1(content) {
-  // Protect content:
-  // Replace escaped char with marker to prevent wrong regex match.
+  let contentMatch;
+  // Protect content
   // Replace code block with marker to ensure LaTeX markup within code
   // blocks is not processed.
   // These markers are replaced with their associated code blocs after
   // blocks have been processed.
   // WARN: Do not change the order of matches!
-  let contentMatch;
-  const escapeMatch = content.match(regex.escapeDollarMarkup) || [];
-  escapeMatch.forEach((item) => {
-    content = content.replace(item, () => commentReplaceDollarMark);
-  });
   while ((contentMatch = content.match(regex.codeTagMarkup)) !== null) {
     content = matchReplacedConent(content, contentMatch, 0, codePlaceholder);
   }
@@ -283,14 +274,6 @@ function renderStage1(content) {
 function renderStage2(html) {
   let contentMatch;
   html = html.replaceAll(deleteReplaceMark, '');
-
-  // Temporary work around for docsify issue:
-  // https://github.com/docsifyjs/docsify/issues/1881
-  while ((contentMatch = regex.commentReplaceDollarMarkup.exec(html)) !== null) {
-    const mathComment = contentMatch[0];
-    const mathReplacement = '$';
-    html = html.replace(mathComment, () => mathReplacement);
-  }
 
   // Restore all commented elements
   while ((contentMatch = regex.commentReplaceMarkup.exec(html)) !== null) {
