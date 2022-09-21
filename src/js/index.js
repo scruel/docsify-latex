@@ -16,10 +16,6 @@ function escapeRegex(regexStr) {
   return regexStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function getcommentReplaceMarkedText(text) {
-  return `<!-- ${commentReplaceMark} ${text} -->`;
-}
-
 // Deep cover an object, for every keys in sourceObj, replce the value of targetObj
 // if its key exists, or put key&value into targetObj if not exists.
 function coverObject(sourceObj, targetObj) {
@@ -60,7 +56,7 @@ if (window) {
 // =============================================================================
 const commentReplaceMark = 'latex:replace';
 const deleteReplaceMark = 'latex:delete';
-const commentReplaceDollarMark = getcommentReplaceMarkedText('ESCAPEDOLLAR');
+const commentReplaceDollarMark = getCommentReplaceMarkedText('ESCAPEDOLLAR');
 
 const latexContainerTagName = 'docsify-latex';
 
@@ -113,6 +109,18 @@ else if (hasKatex) {
   // pass
 }
 
+// Regex rules Init
+// =============================================================================
+function getCommentReplaceMarkedText(text, placeholder='') {
+  return `<!-- ${commentReplaceMark} ${placeholder} ${text} -->`;
+}
+
+// Matches replacement comment
+function getCommentReplaceMarkupRegex(placeholder='') {
+  return new RegExp(`<!-- ${commentReplaceMark} ${placeholder} (.*?) -->`);
+}
+
+const codePlaceholder = 'CODE';
 
 const regex = {
   escapeDollarMarkup: /(\\\$)/g,
@@ -131,10 +139,8 @@ const regex = {
 
   commentDeleteReplaceMarkup: /^(>?[ ]*)<!--/gm,
 
-  // Matches replacement comment
-  // 0: Match
-  // 1: Replacement HTML
-  commentReplaceMarkup: new RegExp(`<!-- ${commentReplaceMark} (.*?) -->`),
+  commentReplaceMarkup: getCommentReplaceMarkupRegex(),
+  commentCodeReplaceMarkup: getCommentReplaceMarkupRegex(codePlaceholder),
   commentReplaceDollarMarkup: new RegExp(commentReplaceDollarMark),
 };
 
@@ -195,13 +201,23 @@ function matchMathBlock(content) {
   return null;
 }
 
-function codeMatchReplacedConent(content, contentMatch, replaceMark, codeMatchList, codeMarkerList) {
+/**
+ * Used to replace the content with matched result and wrapper it to comment
+ * to prevent unpredictable behaviour
+ *
+ * @param {*} content original content
+ * @param {*} contentMatch regex match result
+ * @param {*} matchIndexForReplace which index of match result will be used to replace the original content
+ * @param {*} placeholder place holder for replaced content
+ * @param {*} matchList
+ * @param {*} markerList
+ * @returns
+ */
+function matchReplacedConent(content, contentMatch, matchIndexForReplace, placeholder='') {
   const matchLength = contentMatch[0].length;
-  const codeBlock = content.substring(contentMatch.index, contentMatch.index + matchLength);
-  const idx = codeMatchList.push(codeBlock);
-  const codeMarker = getcommentReplaceMarkedText(`${replaceMark}${idx}`);
-  codeMarkerList.push(codeMarker);
-  content = content.substring(0, contentMatch.index) + codeMarker
+  const replaceContent = contentMatch[matchIndexForReplace];
+  const commentedConent = getCommentReplaceMarkedText(window.btoa(encodeURIComponent(replaceContent)), `${placeholder}`);
+  content = content.substring(0, contentMatch.index) + commentedConent
     + content.substring(contentMatch.index + matchLength, content.length);
   return content;
 }
@@ -227,16 +243,14 @@ function renderStage1(content) {
   escapeMatch.forEach((item) => {
     content = content.replace(item, () => commentReplaceDollarMark);
   });
-  const codeMatchList = [];
-  const codeMarkerList = [];
   while ((contentMatch = content.match(regex.codeTagMarkup)) !== null) {
-    content = codeMatchReplacedConent(content, contentMatch, 'CODETAG', codeMatchList, codeMarkerList);
+    content = matchReplacedConent(content, contentMatch, 0, codePlaceholder);
   }
   while ((contentMatch = content.match(regex.codeBlockMarkup)) !== null) {
-    content = codeMatchReplacedConent(content, contentMatch, 'CODEBLOCK', codeMatchList, codeMarkerList);
+    content = matchReplacedConent(content, contentMatch, 0, codePlaceholder);
   }
   while ((contentMatch = content.match(regex.codeInlineMarkup)) !== null) {
-    content = codeMatchReplacedConent(content, contentMatch, 'CODEINLINE', codeMatchList, codeMarkerList);
+    content = matchReplacedConent(content, contentMatch, 0, codePlaceholder);
   }
 
   // Render math blocks
@@ -244,17 +258,22 @@ function renderStage1(content) {
     const matchLength = contentMatch[0].length;
     const mathBlockOut = renderMathContent(contentMatch[0], contentMatch[1], contentMatch.inline);
     const mathBlockOutPorcessed = window.btoa(encodeURIComponent(mathBlockOut));
-    const mathBlockOutReplacement = getcommentReplaceMarkedText(mathBlockOutPorcessed);
+    const mathBlockOutReplacement = getCommentReplaceMarkedText(mathBlockOutPorcessed);
     content = content.substring(0, contentMatch.index) + mathBlockOutReplacement
       + content.substring(contentMatch.index + matchLength, content.length);
   }
 
   // Unprotect content - restore code blocks
-  codeMarkerList.forEach((item, i) => {
-    content = content.replace(item, () => codeMatchList[i]);
-  });
-  // Ensure docsify can render line breaks by itself, rather than ignore empty lines.
+  while ((contentMatch = regex.commentCodeReplaceMarkup.exec(content)) !== null) {
+    const commentMark = contentMatch[0];
+    const originalContent = contentMatch[1] || '';
+    content = content.replace(commentMark, () => (decodeURIComponent(window.atob(originalContent))));
+  }
+
+  // Put this in end of the processing pipeline, ensure docsify can render line breaks
+  //  by itself, rather than ignore empty lines.
   content = content.replaceAll(regex.commentDeleteReplaceMarkup, `$1${deleteReplaceMark}<!--`);
+
   return content;
 }
 
@@ -266,22 +285,22 @@ function renderStage1(content) {
  * @returns {string}
  */
 function renderStage2(html) {
-  let mathReplaceMatch;
+  let contentMatch;
   html = html.replaceAll(deleteReplaceMark, '');
 
   // Temporary work around for docsify issue:
   // https://github.com/docsifyjs/docsify/issues/1881
-  while ((mathReplaceMatch = regex.commentReplaceDollarMarkup.exec(html)) !== null) {
-    const mathComment = mathReplaceMatch[0];
+  while ((contentMatch = regex.commentReplaceDollarMarkup.exec(html)) !== null) {
+    const mathComment = contentMatch[0];
     const mathReplacement = '$';
     html = html.replace(mathComment, () => mathReplacement);
   }
 
   // Restore all commented elements
-  while ((mathReplaceMatch = regex.commentReplaceMarkup.exec(html)) !== null) {
-    const mathComment = mathReplaceMatch[0];
-    const mathReplacement = mathReplaceMatch[1] || '';
-    html = html.replace(mathComment, () => (decodeURIComponent(window.atob(mathReplacement))));
+  while ((contentMatch = regex.commentReplaceMarkup.exec(html)) !== null) {
+    const commentMark = contentMatch[0];
+    const originalContent = contentMatch[1] || '';
+    html = html.replace(commentMark, () => (decodeURIComponent(window.atob(originalContent))));
   }
   return html;
 }
