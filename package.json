@@ -1,7 +1,7 @@
 {
   "name": "docsify-latex",
   "version": "0.1.3",
-  "description": "A docsify.js plugin for rendering LaTeX math blocks from markdown",
+  "description": "A docsify.js plugin for typesetting LaTeX with display engines from markdown",
   "author": "Scruel Tao",
   "license": "MIT",
   "homepage": "https://scruel.github.io/docsify-latex/",

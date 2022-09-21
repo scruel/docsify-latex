@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>docsify-latex - A docsify.js plugin for typesetting LaTeX with display engines from markdown</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta name="description" content="A docsify.js plugin for typesetting LaTeX with display engines from markdown.">
+
+  <link rel="stylesheet" media="(prefers-color-scheme: dark)" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css">
+  <link rel="stylesheet" media="(prefers-color-scheme: light)" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css">
+
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    window.$docsify = {
+      name: 'docsify-latex',
+      repo: 'scruel/docsify-latex',
+      homepage: 'index.md',
+      loadSidebar: 'sidebar.md',
+
+      autoHeader: true,
+      subMaxLevel: 3,
+
+      auto2top: true,
+      executeScript: true,
+      mergeNavbar: true,
+
+      search: {
+        maxAge: 86400000,
+        paths: 'auto', // or 'auto'
+        placeholder: 'Type to search',
+        noData: 'No Results',
+        depth: 4,
+      },
+      // markdown: {
+      //   breaks: true,
+      // },
+      latex: {
+        inlineMath   : [['@', '@']],
+        displayMath  : [['@@', '@@']],
+      }
+    }
+  </script>
+  <!-- Docsify v4 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
+
+  <!-- highlight -->
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-latex.min.js"></script>
+
+  <!-- theme -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-themeable@0/dist/js/docsify-themeable.min.js"></script>
+
+  <!-- math -->
+  <script src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-latex@latest/dist/docsify-latex.js"></script>
+
+</body>
+</html>
