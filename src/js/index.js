@@ -120,6 +120,14 @@ function getCommentReplaceMarkupRegex(placeholder='') {
   return new RegExp(`<!-- ${commentReplaceMark} ${placeholder} (.*?) -->`);
 }
 
+function getBlockRegex(matchStartRegex, matchEndRegex, needMatchMultipleLine) {
+  // Escape string according to regex syntax
+  matchStartRegex = escapeRegex(matchStartRegex);
+  matchEndRegex = escapeRegex(matchEndRegex);
+  // Matches markdown inline math
+  return new RegExp(`(?<=[^\\\\]|^)${matchStartRegex}(([^\\\\]|\\\\.)*?)${matchEndRegex}`, needMatchMultipleLine ? 'm' : '');
+}
+
 const codePlaceholder = 'CODE';
 
 const regex = {
@@ -127,15 +135,15 @@ const regex = {
 
   // Matches html code blocks (inline and multi-line)
   // Example: <code>CODE</code>
-  codeTagMarkup: new RegExp('(?<=[^\\\\]|^)(<code>[\\s\\S]*?(?<=[^\\\\])</code>)', 'm'),
+  codeTagMarkup: getBlockRegex('<code>', '</code>', true),
 
   // Matches markdown code blocks (inline and multi-line)
   // Example: ```CODE```
-  codeBlockMarkup: new RegExp('(?<=[^\\\\]|^)(```[\\s\\S]*?(?<=[^\\\\])```)', 'm'),
+  codeBlockMarkup: getBlockRegex('```', '```', true),
 
   // Matches markdown inline code
   // Example: `CODE`
-  codeInlineMarkup: new RegExp('(?<=[^\\\\]|^)(`.*?(?<=[^\\\\])`)'),
+  codeInlineMarkup: getBlockRegex('`', '`', false),
 
   commentDeleteReplaceMarkup: /^(>?[ ]*)<!--/gm,
 
@@ -146,7 +154,7 @@ const regex = {
 
 // Math Render functions
 // =============================================================================
-function renderMathContent(content, latex, isInline) {
+function renderMathContent(content, latex, displayMode) {
   if (hasMathJax) {
     return MathJax.renderToString(content);
   } else if (hasKatex) {
@@ -154,7 +162,7 @@ function renderMathContent(content, latex, isInline) {
       throwOnError: false
     };
     coverObject(settings.customOptions, options);
-    options.displayMode = !isInline;
+    options.displayMode = displayMode;
 
     return katex.renderToString(latex, options);
   } else {
@@ -162,23 +170,11 @@ function renderMathContent(content, latex, isInline) {
   }
 }
 
-function getRegexMarkup(matchStartRegex, matchEndRegex, isInline) {
-  // Escape string according to regex syntax
-  matchStartRegex = escapeRegex(matchStartRegex);
-  matchEndRegex = escapeRegex(matchEndRegex);
-  // Matches markdown inline math
-  if (isInline) {
-    return new RegExp(`(?<=[^\\\\]|^)${matchStartRegex}(.*?(?<=[^\\\\]))${matchEndRegex}`);
-  }
-  // Matches markdown math blocks
-  return new RegExp(`(?<=[^\\\\]|^)${matchStartRegex}([\\s\\S]*?(?<=[^\\\\]))${matchEndRegex}`, 'm');
-}
-
-function matchMathBlockRegex(content, regexGroup, isInline){
-  const mathRegex = getRegexMarkup(regexGroup[0], regexGroup[1], isInline);
+function matchMathBlockRegex(content, regexGroup, displayMode){
+  const mathRegex = getBlockRegex(regexGroup[0], regexGroup[1], displayMode);
   const result = content.match(mathRegex);
   if (result) {
-    result.inline = isInline;
+    result.displayMode = displayMode;
     result.regex = mathRegex;
     return result;
   }
@@ -187,13 +183,13 @@ function matchMathBlockRegex(content, regexGroup, isInline){
 
 function matchMathBlock(content) {
   for (const regexGroup of settings.displayMath) {
-    const result = matchMathBlockRegex(content, regexGroup, false);
+    const result = matchMathBlockRegex(content, regexGroup, true);
     if (result) {
       return result;
     }
   }
   for (const regexGroup of settings.inlineMath) {
-    const result = matchMathBlockRegex(content, regexGroup, true);
+    const result = matchMathBlockRegex(content, regexGroup, false);
     if (result) {
       return result;
     }
@@ -256,7 +252,7 @@ function renderStage1(content) {
   // Render math blocks
   while ((contentMatch = matchMathBlock(content)) !== null) {
     const matchLength = contentMatch[0].length;
-    const mathBlockOut = renderMathContent(contentMatch[0], contentMatch[1], contentMatch.inline);
+    const mathBlockOut = renderMathContent(contentMatch[0], contentMatch[1], contentMatch.displayMode);
     const mathBlockOutPorcessed = window.btoa(encodeURIComponent(mathBlockOut));
     const mathBlockOutReplacement = getCommentReplaceMarkedText(mathBlockOutPorcessed);
     content = content.substring(0, contentMatch.index) + mathBlockOutReplacement
@@ -271,7 +267,7 @@ function renderStage1(content) {
   }
 
   // Put this in end of the processing pipeline, ensure docsify can render line breaks
-  //  by itself, rather than ignore empty lines.
+  // by itself, rather than ignore empty lines.
   content = content.replaceAll(regex.commentDeleteReplaceMarkup, `$1${deleteReplaceMark}<!--`);
 
   return content;
