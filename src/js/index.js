@@ -4,7 +4,15 @@ import { version as pkgVersion } from '../../package.json';
 
 // Base Tool Functions
 // =============================================================================
-function unescapeRegexEscape(regexStr) {
+function escapeHtml(unsafe) {
+  return unsafe.replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function escapeRegex(regexStr) {
   return regexStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
@@ -62,7 +70,7 @@ const hasKatex = (typeof katex !== 'undefined' && katex);
 if (hasMathJax) {
   // MathJax configs and functions init
   MathJax.renderToString = (content) => {
-    return `<${latexContainerTagName}>${content}</${latexContainerTagName}>`;
+    return `<${latexContainerTagName}>${escapeHtml(content)}</${latexContainerTagName}>`;
   };
   if (MathJax.version[0] === '3') {
     coverObject(settings.customOptions, MathJax.config);
@@ -150,8 +158,8 @@ function renderMathContent(content, latex, isInline) {
 
 function getRegexMarkup(matchStartRegex, matchEndRegex, isInline) {
   // Escape string according to regex syntax
-  matchStartRegex = unescapeRegexEscape(matchStartRegex);
-  matchEndRegex = unescapeRegexEscape(matchEndRegex);
+  matchStartRegex = escapeRegex(matchStartRegex);
+  matchEndRegex = escapeRegex(matchEndRegex);
   // Matches markdown inline math
   if (isInline) {
     return new RegExp(`(?<=[^\\\\]|^)${matchStartRegex}(.*?(?<=[^\\\\]))${matchEndRegex}`);
@@ -186,6 +194,7 @@ function matchMathBlock(content) {
   }
   return null;
 }
+
 function codeMatchReplacedConent(content, contentMatch, replaceMark, codeMatchList, codeMarkerList) {
   const matchLength = contentMatch[0].length;
   const codeBlock = content.substring(contentMatch.index, contentMatch.index + matchLength);
@@ -196,6 +205,7 @@ function codeMatchReplacedConent(content, contentMatch, replaceMark, codeMatchLi
     + content.substring(contentMatch.index + matchLength, content.length);
   return content;
 }
+
 /**
  * Converts LaTeX content into "stage 1" markup. Stage 1 markup contains temporary
  * comments which are replaced with HTML during Stage 2. This approach allows
@@ -233,7 +243,8 @@ function renderStage1(content) {
   while ((contentMatch = matchMathBlock(content)) !== null) {
     const matchLength = contentMatch[0].length;
     const mathBlockOut = renderMathContent(contentMatch[0], contentMatch[1], contentMatch.inline);
-    const mathBlockOutReplacement = getcommentReplaceMarkedText(window.btoa(encodeURIComponent(mathBlockOut)));
+    const mathBlockOutPorcessed = window.btoa(encodeURIComponent(mathBlockOut));
+    const mathBlockOutReplacement = getcommentReplaceMarkedText(mathBlockOutPorcessed);
     content = content.substring(0, contentMatch.index) + mathBlockOutReplacement
       + content.substring(contentMatch.index + matchLength, content.length);
   }
