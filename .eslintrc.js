@@ -9,7 +9,8 @@ module.exports = {
     'eslint:recommended'
   ],
   'ignorePatterns': [
-    'dist'
+    'dist',
+    'docst'
   ],
   'parserOptions': {
     'ecmaVersion': 8,

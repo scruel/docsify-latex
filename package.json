@@ -40,7 +40,7 @@
     "build": "rollup -c",
     "clean": "rimraf dist/*",
     "escheck": "es-check es5 'dist/**/*.js'",
-    "lint": "eslint . && markdownlint . --ignore node_modules",
+    "lint": "eslint . && markdownlint . --ignore node_modules --ignore docst --ignore TODO.md",
     "prepare": "run-s clean build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "version": "run-s prepare lint escheck"
