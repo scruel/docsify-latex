@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.2.0
+
+*2022-09-22*
+
+- Support cross-reference jump
+
 ## 0.1.x
 
 *2022-09-18* - *2022-09-22*
