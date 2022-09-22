@@ -142,7 +142,7 @@ function getBlockRegex(matchStartRegex, matchEndRegex, needMatchMultipleLine) {
   matchStartRegex = escapeRegex(matchStartRegex);
   matchEndRegex = escapeRegex(matchEndRegex);
   // Matches markdown inline math
-  return new RegExp(`(?<=[^\\\\]|^)${matchStartRegex}(([^\\\\${needMatchMultipleLine ? '' : '\n'}]|\\\\.)*?)${matchEndRegex}`);
+  return new RegExp(`(?<=[^\\\\]|^)${matchStartRegex}(([^\\\\${needMatchMultipleLine ? '' : '\n'}]|\\\\.)+?)${matchEndRegex}`);
 }
 
 const codePlaceholder = 'CODE';
@@ -185,14 +185,14 @@ function matchMathBlockRegex(content, regexGroup, displayMode){
 }
 
 function matchMathBlock(content) {
-  for (const regexGroup of settings.displayMath) {
-    const result = matchMathBlockRegex(content, regexGroup, true);
+  for (const regexGroup of settings.inlineMath) {
+    const result = matchMathBlockRegex(content, regexGroup, false);
     if (result) {
       return result;
     }
   }
-  for (const regexGroup of settings.inlineMath) {
-    const result = matchMathBlockRegex(content, regexGroup, false);
+  for (const regexGroup of settings.displayMath) {
+    const result = matchMathBlockRegex(content, regexGroup, true);
     if (result) {
       return result;
     }
