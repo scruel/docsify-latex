@@ -142,7 +142,7 @@ function getBlockRegex(matchStartRegex, matchEndRegex, needMatchMultipleLine) {
   matchStartRegex = escapeRegex(matchStartRegex);
   matchEndRegex = escapeRegex(matchEndRegex);
   // Matches markdown inline math
-  return new RegExp(`(?<=[^\\\\]|^)${matchStartRegex}(([^\\\\]|\\\\.)*?)${matchEndRegex}`, needMatchMultipleLine ? 'm' : '');
+  return new RegExp(`(?<=[^\\\\]|^)${matchStartRegex}(([^\\\\${needMatchMultipleLine ? '' : '\n'}]|\\\\.)*?)${matchEndRegex}`);
 }
 
 const codePlaceholder = 'CODE';
@@ -170,9 +170,14 @@ const regex = {
 // =============================================================================
 function matchMathBlockRegex(content, regexGroup, displayMode){
   const mathRegex = getBlockRegex(regexGroup[0], regexGroup[1], displayMode);
-  const result = content.match(mathRegex);
-  if (result) {
+  const matchResult = content.match(mathRegex);
+  if (matchResult) {
+    const result = {};
     result.displayMode = displayMode;
+    result.index = matchResult.index;
+    result.content = matchResult[0];
+    result.latex = matchResult[1];
+    // For debug only
     result.regex = mathRegex;
     return result;
   }
@@ -244,8 +249,8 @@ function renderStage1(content) {
 
   // Render math blocks
   while ((contentMatch = matchMathBlock(content)) !== null) {
-    const matchLength = contentMatch[0].length;
-    const preparedContent = latexRender.prepareContent(contentMatch[0], contentMatch[1]);
+    const matchLength = contentMatch.content.length;
+    const preparedContent = latexRender.prepareContent(contentMatch.content, contentMatch.latex);
     const preparedHTML = `<${latexTagName} ${latexTagDisplayAttrName}='${contentMatch.displayMode}'>${escapeHtml(preparedContent)}</${latexTagName}>`;
     const contentReplacement = getCommentReplaceMarkedText(window.btoa(encodeURIComponent(preparedHTML)));
     content = content.substring(0, contentMatch.index) + contentReplacement
