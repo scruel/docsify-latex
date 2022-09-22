@@ -9,6 +9,19 @@ latexRender.renderElement = (element, displayMode) => {};
 
 // - MathJax (V2, V3)
 if (typeof MathJax !== 'undefined' && MathJax) {
+  const addClickJump = (parentNodeName, element) => {
+    const elements = element.querySelectorAll(`${parentNodeName} a[href]`);
+    if (elements === null) {
+      return;
+    }
+    for (const element of elements) {
+      const refId = decodeURIComponent(element.getAttribute('href')).substring(1);
+      element.onclick = () => {
+        document.getElementById(refId).scrollIntoView();
+        return false;
+      };
+    }
+  };
   // MathJax configs and functions init
   if (MathJax.version[0] === '3') {
     coverObject(settings.customOptions, MathJax.config);
@@ -18,7 +31,10 @@ if (typeof MathJax !== 'undefined' && MathJax) {
     MathJax.startup.getComponents();
 
     latexRender.renderElement = (element, displayMode) => {
-      MathJax.typesetPromise([element]);
+      MathJax.typesetPromise([element])
+        .then(() => {
+          addClickJump('mjx-math', element);
+        });
     };
   } else if (MathJax.version[0] === '2') {
     const options = {
@@ -40,6 +56,7 @@ if (typeof MathJax !== 'undefined' && MathJax) {
     latexRender.renderElement = (element, displayMode) => {
       MathJax.Hub.Queue(
         ['Typeset', MathJax.Hub, element],
+        [addClickJump, 'docsify-latex', element]
       );
     };
   }
