@@ -5,6 +5,7 @@ import { coverObject, unescapeHtml } from './tools';
 
 const latexRender = Object;
 latexRender.prepareContent = (content, latex) => { return content; };
+latexRender.prepareRender = () => {};
 latexRender.renderElement = (element, displayMode) => {};
 
 const addReferenceJump = (element) => {
@@ -30,7 +31,10 @@ if (typeof MathJax !== 'undefined' && MathJax) {
     MathJax.config.tex.inlineMath = settings.inlineMath;
     MathJax.config.tex.displayMath = settings.displayMath;
     MathJax.startup.getComponents();
-
+    latexRender.prepareRender = () => {
+      MathJax.startup.defaultReady();
+      MathJax.startup.output.clearCache();
+    };
     latexRender.renderElement = (element, displayMode) => {
       MathJax.typesetPromise([element])
         .then(() => {
@@ -53,7 +57,14 @@ if (typeof MathJax !== 'undefined' && MathJax) {
     MathJax.Hub.Config(options);
     MathJax.Hub.processSectionDelay = 0;
     MathJax.Hub.processUpdateDelay = 0;
-
+    latexRender.prepareRender = () => {
+      MathJax.Hub.Queue(
+        ['PreProcess',MathJax.Hub],
+        ['resetEquationNumbers',MathJax.InputJax.TeX],
+        ['PreProcess',MathJax.Hub],
+        ['Reprocess',MathJax.Hub]
+      );
+    };
     latexRender.renderElement = (element, displayMode) => {
       MathJax.Hub.Queue(
         ['Typeset', MathJax.Hub, element],

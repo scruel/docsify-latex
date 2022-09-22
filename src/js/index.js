@@ -178,6 +178,7 @@ function renderStage2(html) {
 }
 
 function renderStage3() {
+  latexRender.prepareRender();
   // Perform remain actions to latex elements
   const mathElements =  document.getElementsByTagName(latexTagName);
   for (const element of mathElements) {
