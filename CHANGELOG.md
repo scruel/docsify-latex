@@ -2,7 +2,7 @@
 
 ## 0.1.x
 
-*2022-09-18* - *2022-09-21*
+*2022-09-18* - *2022-09-22*
 
 - Support custom options
 - Code refactor & Fixes
