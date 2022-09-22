@@ -22,11 +22,16 @@ List of integrated engines:
 - [MathJax V2](https://docs.mathjax.org/en/v2.7-latest/index.html)
 - [KaTeX](https://katex.org/docs)
 
-If you want to integrated more, feel free to fire an issue to explain the reason, or more well, you can directly make a pull request.
+If you want to integrate more, feel free to fire an issue to explain the reason, or more well, you can directly make a pull request.
+
+Supported engine features:
+
+- Equation cross-reference jump (same page only)
+- Handling complex LaTeX
 
 ## Installation
 
-Add JavaScript LaTeX display engine, and docsify-latex plugin after docsify and engine scirpts all to your index.html.
+Add JavaScript LaTeX display engine, and docsify-latex plugin after docsify and engine scirpts all to your `index.html`.
 
 Template as following:
 
@@ -44,7 +49,9 @@ Template as following:
 >
 > To keep loading scripts in order, you also should remove `async` attribute from the related script elements.
 
-Review the [Options](#Options) section and configure as needed, for sample usage, you can juse use:
+Review the [Options](#Options) section and configure as needed.
+
+For sample usage, you can just use the default options:
 
 ```javascript
 window.$docsify = {
@@ -103,7 +110,7 @@ E=mc^2
 $$
 ```
 
-> Go to LaTeX display engine official website for more details about how to write LaTeX, you can click links in [Features](#Features) section to visit specific LaTeX engines documentation website.
+> Go to display engine official website for more details about supported LaTeX functions, you can click links in [Features](#Features) section to visit specific engines documentation website.
 
 ### Demos
 
@@ -188,7 +195,7 @@ E=mc^2
 - Type: `Object`
 - Default: `{}`
 
-Let you have a change to specify LaTeX engine options, so that engine can act by your customized options.
+Let you have a change to configure LaTeX engine options, so that engine can act by your customized options.
 
 > Notice:
 >

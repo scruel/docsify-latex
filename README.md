@@ -12,7 +12,7 @@ A [docsify.js](https://docsify.js.org) plugin for typesetting LaTeX with display
 
 ## Installation
 
-Add JavaScript LaTeX display engine, and docsify-latex plugin after docsify and engine scirpts all to your index.html.
+Add JavaScript LaTeX display engine, and docsify-latex plugin after docsify and engine scirpts all to your `index.html`.
 
 For example, I recommend [MathJax][MathJax], and load scripts from the content delivery network (CDN):
 
@@ -25,7 +25,7 @@ For example, I recommend [MathJax][MathJax], and load scripts from the content d
 <script src="//cdn.jsdelivr.net/npm/docsify-latex@latest/dist/docsify-latex.js"></script>
 ```
 
-Specify options for LaTeX display engine rendering behaviour:
+Configure latex plugin options:
 
 ```javascript
 window.$docsify = {
@@ -57,7 +57,7 @@ E=mc^2
 $$
 ```
 
-Go to LaTeX display engine official website for more details about how to write LaTeX.
+Go to display engine official website for more details about supported LaTeX functions.
 
 See [Documentation site][Documentation] for more usage and more details.
 
@@ -75,7 +75,12 @@ List of integrated engines:
 - [MathJax V2](https://docs.mathjax.org/en/v2.7-latest/index.html)
 - [KaTeX](https://katex.org/docs)
 
-If you want to integrated more, feel free to fire an issue to explain the reason, or more well, you can directly make a pull request.
+If you want to integrate more, feel free to fire an issue to explain the reason, or more well, you can directly make a pull request.
+
+Supported engine features:
+
+- Equation cross-reference jump (same page only)
+- Handling complex LaTeX
 
 ## License
 

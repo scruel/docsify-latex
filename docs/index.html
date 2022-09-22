@@ -22,7 +22,7 @@
       name: 'docsify-latex',
       repo: 'scruel/docsify-latex',
       homepage: 'index.md',
-      loadSidebar: 'sidebar.md',
+      loadSidebar: true,
 
       autoHeader: true,
       subMaxLevel: 3,
@@ -38,12 +38,14 @@
         noData: 'No Results',
         depth: 4,
       },
-      // markdown: {
-      //   breaks: true,
-      // },
       latex: {
-        inlineMath   : [['@', '@']],
-        displayMath  : [['@@', '@@']],
+        inlineMath   : [['$', '$'], ['@', '@']],
+        displayMath  : [['$$', '$$'], ['@@', '@@']],
+        customOptions: {
+          tex: {
+            tags: 'ams'
+          }
+        }
       }
     }
   </script>
