@@ -12,6 +12,15 @@ function escapeHtml(unsafe) {
     .replace(/'/g, '&#039;');
 }
 
+function unescapeHtml(htmlStr) {
+  htmlStr = htmlStr.replace(/&lt;/g , '<');
+  htmlStr = htmlStr.replace(/&gt;/g , '>');
+  htmlStr = htmlStr.replace(/&quot;/g , '"');
+  htmlStr = htmlStr.replace(/&#39;/g , '\'');
+  htmlStr = htmlStr.replace(/&amp;/g , '&');
+  return htmlStr;
+}
+
 function escapeRegex(regexStr) {
   return regexStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -32,7 +41,7 @@ function coverObject(sourceObj, targetObj) {
   });
 }
 
-// Constants and variables
+// Settings
 // =============================================================================
 const settings = {
   inlineMath: [['$', '$'], ['\\(', '\\)']],
@@ -52,21 +61,15 @@ if (window) {
   window.$docsify.latex.version = pkgVersion;
 }
 
-// Math Render Init
+// Math display engine integration
 // =============================================================================
-const commentReplaceMark = 'latex:replace';
-const deleteReplaceMark = 'latex:delete';
+const latexRender = Object;
+latexRender.prepareContent = (content, latex) => { return content; };
+latexRender.renderElement = (element, displayMode) => {};
 
-const latexContainerTagName = 'docsify-latex';
-
-let hasMathJax = (typeof MathJax !== 'undefined' && MathJax);
-const hasKatex = (typeof katex !== 'undefined' && katex);
-
-if (hasMathJax) {
+// - MathJax (V2, V3)
+if (typeof MathJax !== 'undefined' && MathJax) {
   // MathJax configs and functions init
-  MathJax.renderToString = (content) => {
-    return `<${latexContainerTagName}>${escapeHtml(content)}</${latexContainerTagName}>`;
-  };
   if (MathJax.version[0] === '3') {
     coverObject(settings.customOptions, MathJax.config);
     // Prevent inconsistency render symbol problem
@@ -74,8 +77,8 @@ if (hasMathJax) {
     MathJax.config.tex.displayMath = settings.displayMath;
     MathJax.startup.getComponents();
 
-    MathJax.renderElement = (mathbox) => {
-      MathJax.typesetPromise([mathbox]);
+    latexRender.renderElement = (element, displayMode) => {
+      MathJax.typesetPromise([element]);
     };
   } else if (MathJax.version[0] === '2') {
     const options = {
@@ -94,19 +97,34 @@ if (hasMathJax) {
     MathJax.Hub.processSectionDelay = 0;
     MathJax.Hub.processUpdateDelay = 0;
 
-    MathJax.renderElement = (mathbox) => {
+    latexRender.renderElement = (element, displayMode) => {
       MathJax.Hub.Queue(
-        ['Typeset', MathJax.Hub, mathbox],
+        ['Typeset', MathJax.Hub, element],
       );
     };
   }
-  else {
-    hasMathJax = false;
-  }
 }
-else if (hasKatex) {
-  // pass
+// - KaTeX
+else if (typeof katex !== 'undefined' && katex) {
+  const options = {
+    throwOnError: false
+  };
+  coverObject(settings.customOptions, options);
+
+  latexRender.prepareContent = (_content, latex) => { return latex; };
+  latexRender.renderElement = (element, displayMode) => {
+    options.displayMode = displayMode;
+    element.innerHTML = katex.renderToString(unescapeHtml(element.innerHTML), options);
+  };
 }
+
+// Constants and variables
+// =============================================================================
+const commentReplaceMark = 'latex:replace';
+const deleteReplaceMark = 'latex:delete';
+
+const latexTagName = 'docsify-latex';
+const latexTagDisplayAttrName = 'display';
 
 // Regex rules Init
 // =============================================================================
@@ -148,24 +166,8 @@ const regex = {
   commentCodeReplaceMarkup: getCommentReplaceMarkupRegex(codePlaceholder)
 };
 
-// Math Render functions
+// Match functions
 // =============================================================================
-function renderMathContent(content, latex, displayMode) {
-  if (hasMathJax) {
-    return MathJax.renderToString(content);
-  } else if (hasKatex) {
-    const options = {
-      throwOnError: false
-    };
-    coverObject(settings.customOptions, options);
-    options.displayMode = displayMode;
-
-    return katex.renderToString(latex, options);
-  } else {
-    return content;
-  }
-}
-
 function matchMathBlockRegex(content, regexGroup, displayMode){
   const mathRegex = getBlockRegex(regexGroup[0], regexGroup[1], displayMode);
   const result = content.match(mathRegex);
@@ -243,10 +245,10 @@ function renderStage1(content) {
   // Render math blocks
   while ((contentMatch = matchMathBlock(content)) !== null) {
     const matchLength = contentMatch[0].length;
-    const mathBlockOut = renderMathContent(contentMatch[0], contentMatch[1], contentMatch.displayMode);
-    const mathBlockOutPorcessed = window.btoa(encodeURIComponent(mathBlockOut));
-    const mathBlockOutReplacement = getCommentReplaceMarkedText(mathBlockOutPorcessed);
-    content = content.substring(0, contentMatch.index) + mathBlockOutReplacement
+    const preparedContent = latexRender.prepareContent(contentMatch[0], contentMatch[1]);
+    const preparedHTML = `<${latexTagName} ${latexTagDisplayAttrName}='${contentMatch.displayMode}'>${escapeHtml(preparedContent)}</${latexTagName}>`;
+    const contentReplacement = getCommentReplaceMarkedText(window.btoa(encodeURIComponent(preparedHTML)));
+    content = content.substring(0, contentMatch.index) + contentReplacement
       + content.substring(contentMatch.index + matchLength, content.length);
   }
 
@@ -286,11 +288,10 @@ function renderStage2(html) {
 
 function renderStage3() {
   // Perform remain actions to latex elements
-  if (hasMathJax) {
-    const mathElements =  document.getElementsByTagName(latexContainerTagName);
-    for (const mathbox of mathElements) {
-      MathJax.renderElement(mathbox);
-    }
+  const mathElements =  document.getElementsByTagName(latexTagName);
+  for (const element of mathElements) {
+    const displayMode = element.getAttribute(latexTagDisplayAttrName) === 'true';
+    latexRender.renderElement(element, displayMode);
   }
 }
 
