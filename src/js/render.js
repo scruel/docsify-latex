@@ -7,21 +7,22 @@ const latexRender = Object;
 latexRender.prepareContent = (content, latex) => { return content; };
 latexRender.renderElement = (element, displayMode) => {};
 
+const addReferenceJump = (element) => {
+  const elements = element.querySelectorAll('docsify-latex a[href]');
+  if (elements === null) {
+    return;
+  }
+  for (const linkElement of elements) {
+    const refId = decodeURIComponent(linkElement.getAttribute('href')).substring(1);
+    linkElement.onclick = () => {
+      document.getElementById(refId).scrollIntoView();
+      return false;
+    };
+  }
+};
+
 // - MathJax (V2, V3)
 if (typeof MathJax !== 'undefined' && MathJax) {
-  const addClickJump = (parentNodeName, element) => {
-    const elements = element.querySelectorAll(`${parentNodeName} a[href]`);
-    if (elements === null) {
-      return;
-    }
-    for (const element of elements) {
-      const refId = decodeURIComponent(element.getAttribute('href')).substring(1);
-      element.onclick = () => {
-        document.getElementById(refId).scrollIntoView();
-        return false;
-      };
-    }
-  };
   // MathJax configs and functions init
   if (MathJax.version[0] === '3') {
     coverObject(settings.customOptions, MathJax.config);
@@ -33,7 +34,7 @@ if (typeof MathJax !== 'undefined' && MathJax) {
     latexRender.renderElement = (element, displayMode) => {
       MathJax.typesetPromise([element])
         .then(() => {
-          addClickJump('mjx-math', element);
+          addReferenceJump(element);
         });
     };
   } else if (MathJax.version[0] === '2') {
@@ -56,7 +57,7 @@ if (typeof MathJax !== 'undefined' && MathJax) {
     latexRender.renderElement = (element, displayMode) => {
       MathJax.Hub.Queue(
         ['Typeset', MathJax.Hub, element],
-        [addClickJump, 'docsify-latex', element]
+        [addReferenceJump, element]
       );
     };
   }
@@ -64,7 +65,13 @@ if (typeof MathJax !== 'undefined' && MathJax) {
 // - KaTeX
 else if (typeof katex !== 'undefined' && katex) {
   const options = {
-    throwOnError: false
+    throwOnError: false,
+    trust: (context) => ['\\htmlId', '\\href'].includes(context.command),
+    macros: {
+      '\\eqref': '\\href{##ktx-#1}{(\\text{#1})}',
+      '\\ref': '\\href{##ktx-#1}{\\text{#1}}',
+      '\\label': '\\htmlId{ktx-#1}{}'
+    }
   };
   coverObject(settings.customOptions, options);
 
@@ -72,6 +79,7 @@ else if (typeof katex !== 'undefined' && katex) {
   latexRender.renderElement = (element, displayMode) => {
     options.displayMode = displayMode;
     element.innerHTML = katex.renderToString(unescapeHtml(element.innerHTML), options);
+    addReferenceJump(element);
   };
 }
 
