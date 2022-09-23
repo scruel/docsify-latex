@@ -14,11 +14,14 @@ const addReferenceJump = (element) => {
     return;
   }
   for (const linkElement of elements) {
-    const refId = decodeURIComponent(linkElement.getAttribute('href')).substring(1);
-    linkElement.onclick = () => {
-      document.getElementById(refId).scrollIntoView();
-      return false;
-    };
+    const hrefAttr = linkElement.getAttribute('href');
+    const refId = decodeURIComponent(hrefAttr).substring(1);
+    if (hrefAttr.startsWith('#')) {
+      linkElement.onclick = () => {
+        document.getElementById(refId).scrollIntoView();
+        return false;
+      };
+    }
   }
 };
 
