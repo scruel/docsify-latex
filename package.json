@@ -41,9 +41,9 @@
     "clean": "rimraf dist/*",
     "escheck": "es-check es5 'dist/**/*.js'",
     "lint": "eslint . && markdownlint . --ignore node_modules --ignore docst --ignore TODO.md",
-    "prepare": "run-s clean build",
+    "prepare": "run-s lint clean build",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "version": "run-s prepare lint escheck"
+    "version": "run-s prepare escheck"
   },
   "devDependencies": {
     "@babel/core": "^7.13.16",
