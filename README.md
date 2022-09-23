@@ -80,7 +80,7 @@ If you want to integrate more, feel free to fire an issue to explain the reason,
 Supported engine features:
 
 - Equation cross-reference jump (same page only)
-- Handling complex LaTeX
+- [Handling complex $\LaTeX$ equations][Documentation Example]
 
 ## License
 
@@ -92,3 +92,4 @@ Copyright (c) Scruel Tao ([@scruel](https://github.com/scruel))
 
 [MathJax]: https://docs.mathjax.org
 [Documentation]: https://scruel.github.io/docsify-latex
+[Documentation Example]: https://scruel.github.io/docsify-latex/#/example

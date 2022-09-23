@@ -2,15 +2,83 @@
 
 ## Complex Content
 
-Price (\$) for resource ($y$)
+```latex
+Price (\$) for house ($y$)
+```
+
+Price (\$) for house ($y$)
+
+----
+
+```latex
+$$
+\overbrace{a+b+c}^{\text{note}}
+$$
+```
 
 $$
 \overbrace{a+b+c}^{\text{note}}
 $$
 
+----
+
+```latex
 $$
 \sum_{\substack{0<i<m\\0<j<n}}
 $$
+```
+
+$$
+\sum_{\substack{0<i<m\\0<j<n}}
+$$
+
+----
+
+`\hbox` put their argument into text mode. To raise math, nest `$…$` delimiters inside the argument as shown below.
+
+```latex
+$$
+a+\left(\vcenter{\hbox{$\frac{\frac a b}c$}}\right)
+$$
+```
+
+$$
+a+\left(\vcenter{\hbox{$\frac{\frac a b}c$}}\right)
+$$
+
+----
+
+```latex
+$x+y^{2x}\tag*{MEE}\label{mee}$
+```
+
+$$E = mc^2\tag*{MEE}\label{mee}$$
+
+----
+
+`\newcommand` function:
+
+```latex
+$$
+\newcommand{\hdotsfour}{\cdots & \cdots & \cdots & \cdots}
+\begin{pmatrix}
+ 1     &  \frac{1}{2}  &\dots  &\frac{1}{n} \\
+ \hdotsfour\\
+ m     &  \frac{m}{2} &\dots  &\frac{m}{n}
+ \end{pmatrix}
+$$
+```
+
+$$
+\newcommand{\hdotsfour}{\cdots & \cdots & \cdots & \cdots}
+\begin{pmatrix}
+ 1     &  \frac{1}{2}  &\dots  &\frac{1}{n} \\
+ \hdotsfour\\
+ m     &  \frac{m}{2} &\dots  &\frac{m}{n}
+ \end{pmatrix}
+$$
+
+----
 
 ## Cross-reference jump
 
@@ -25,6 +93,8 @@ $$
 > Use automatic equation numbering or use `\tag` and `\label` to define the equation.
 >
 > For more details, you should check the website of the engine you are using.
+
+I'd like to reference the equation $\eqref{mee}$ from the last chapter, it's a well-known equation all over the world.
 
 When $a \ne 0$, there are two solutions to $ax^2 + bx + c = 0$ and they are $\ref{eq:m1}$
 
