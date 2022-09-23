@@ -5,7 +5,7 @@
 [![GitHub Workflow Status (master)](https://img.shields.io/github/workflow/status/scruel/docsify-latex/Build/master?label=checks&style=flat-square)](https://github.com/scruel/docsify-latex/actions?query=branch%3Amaster+)
 [![jsDelivr](https://data.jsdelivr.com/v1/package/npm/docsify-latex/badge)](https://www.jsdelivr.com/package/npm/docsify-latex)
 
-A [docsify.js](https://docsify.js.org) plugin for typesetting LaTeX with display engines from markdown.
+A [docsify.js](https://docsify.js.org) plugin for typesetting $\LaTeX$ with display engines from markdown.
 
 <br/>
 @@
@@ -14,7 +14,7 @@ A [docsify.js](https://docsify.js.org) plugin for typesetting LaTeX with display
 
 ## Features
 
-This plugin helps you typeset LaTeX with some JavaScript LaTeX display engines.
+This plugin helps you typeset $\LaTeX$ with some JavaScript $\LaTeX$ display engines.
 
 List of integrated engines:
 
@@ -27,11 +27,11 @@ If you want to integrate more, feel free to fire an issue to explain the reason,
 Supported engine features:
 
 - Equation cross-reference jump (same page only)
-- Handling complex LaTeX
+- Handling complex $\LaTeX$
 
 ## Installation
 
-Add JavaScript LaTeX display engine, and docsify-latex plugin after docsify and engine scirpts all to your `index.html`.
+Add JavaScript $\LaTeX$ display engine, and docsify-latex plugin after docsify and engine scirpts all to your `index.html`.
 
 Template as following:
 
@@ -45,7 +45,7 @@ Template as following:
 
 > Notice:
 >
-> You should put docsify-latex plugin script below docsify and LaTeX display engine scripts, because plugin script depends on them.
+> You should put docsify-latex plugin script below docsify and $\LaTeX$ display engine scripts, because plugin script depends on them.
 >
 > To keep loading scripts in order, you also should remove `async` attribute from the related script elements.
 
@@ -100,9 +100,9 @@ Or if you prefer MathJax version 2:
 
 ## Usage
 
-Put LaTeX within symbols you configured.
+Put $\LaTeX$ within symbols you configured.
 
-For example, by default we configured `$$` for marking section inner LaTeX in display mode, then:
+For example, by default we configured `$$` for marking section inner $\LaTeX$ in display mode, then:
 
 ```latex
 $$
@@ -110,7 +110,7 @@ E=mc^2
 $$
 ```
 
-> Go to display engine official website for more details about supported LaTeX functions, you can click links in [Features](#Features) section to visit specific engines documentation website.
+> Go to display engine official website for more details about supported $\LaTeX$ functions, you can click links in [Features](#Features) section to visit specific engines documentation website.
 
 ### Demos
 
@@ -136,7 +136,7 @@ window.$docsify = {
 - Type: `Array[Aarry]`
 - Default: `[['$', '$'], ['\\(', '\\)']]`
 
-Text within `inlineMath` symbols you configured will be rendered in inline mode, LaTeX write for inline mode **must not** cross multiple lines.
+Text within `inlineMath` symbols you configured will be rendered in inline mode, $\LaTeX$ write for inline mode **must not** cross multiple lines.
 
 For example you can even write:
 
@@ -163,7 +163,7 @@ Will be rendered as: @ E=mc^2 @
 
 Text within `displayMath` symbols you configured will be rendered in display mode.
 
-> For differences between the two modes, you should check the documentation of LaTeX engines.
+> For differences between the two modes, you should check the documentation of $\LaTeX$ engines.
 
 For example you can even write:
 
@@ -195,11 +195,11 @@ E=mc^2
 - Type: `Object`
 - Default: `{}`
 
-Let you have a change to configure LaTeX engine options, so that engine can act by your customized options.
+Let you have a change to configure $\LaTeX$ engine options, so that engine can act by your customized options.
 
 > Notice:
 >
-> Override `inlineMath` and `displayMath` related options will not take any effects, it's just to prevent having inconsistent behaviors while typesetting LaTeX.
+> Override `inlineMath` and `displayMath` related options will not take any effects, it's just to prevent having inconsistent behaviors while typesetting $\LaTeX$.
 
 #### MathJax
 
