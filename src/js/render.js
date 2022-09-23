@@ -3,14 +3,19 @@
 import settings from './settings';
 import { coverObject, unescapeHtml } from './tools';
 
+// Template
+// =============================================================================
 const latexRender = Object;
 latexRender.prepareContent = (content, latex) => { return content; };
 latexRender.prepareRender = () => {};
 latexRender.renderElement = (element, displayMode) => {};
+latexRender.afterRender = () => {};
 
+// Implementation
+// =============================================================================
 const addReferenceJump = (element) => {
   const elements = element.querySelectorAll('docsify-latex a[href]');
-  if (elements === null) {
+  if (elements === null || elements.length === 0) {
     return;
   }
   for (const linkElement of elements) {
@@ -35,14 +40,14 @@ if (typeof MathJax !== 'undefined' && MathJax) {
     MathJax.config.tex.displayMath = settings.displayMath;
     MathJax.startup.getComponents();
     latexRender.prepareRender = () => {
-      MathJax.startup.defaultReady();
+      MathJax.startup.getComponents();
       MathJax.startup.output.clearCache();
     };
-    latexRender.renderElement = (element, displayMode) => {
-      MathJax.typesetPromise([element])
-        .then(() => {
-          addReferenceJump(element);
-        });
+    latexRender.renderElement = async (element, displayMode) => {
+      await MathJax.typesetPromise([element]);
+    };
+    latexRender.afterRender = () => {
+      addReferenceJump(document);
     };
   } else if (MathJax.version[0] === '2') {
     const options = {

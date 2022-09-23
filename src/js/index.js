@@ -210,14 +210,15 @@ function renderStage2(html) {
   return html;
 }
 
-function renderStage3() {
+async function renderStage3() {
   latexRender.prepareRender();
   // Perform remain actions to latex elements
   const mathElements =  document.getElementsByTagName(latexTagName);
   for (const element of mathElements) {
     const displayMode = element.getAttribute(latexTagDisplayAttrName) === 'true';
-    latexRender.renderElement(element, displayMode);
+    await latexRender.renderElement(element, displayMode);
   }
+  latexRender.afterRender();
 }
 
 // Plugin
@@ -232,8 +233,8 @@ function initLatex(hook, vm) {
     html = renderStage2(html);
     next(html);
   });
-  hook.doneEach(function() {
-    renderStage3();
+  hook.doneEach(async function() {
+    await renderStage3();
   });
 
 }
