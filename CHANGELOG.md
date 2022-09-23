@@ -1,10 +1,11 @@
 # Change Log
 
-## 0.2.0
+## 0.2.1
 
-*2022-09-22*
+*2022-09-22* - *2022-09-23*
 
 - Support cross-reference jump
+- Code refactor & Fixes
 
 ## 0.1.x
 
