@@ -63,6 +63,7 @@ function matchMathBlockRegex(content, regexGroup, displayMode){
     result.index = matchResult.index;
     result.content = matchResult[0];
     result.latex = matchResult[1];
+    result.endIndex = result.index + result.content.length;
     // For debug only
     result.regex = mathRegex;
     return result;
@@ -70,20 +71,41 @@ function matchMathBlockRegex(content, regexGroup, displayMode){
   return null;
 }
 
-function matchMathBlock(content) {
+function matchMathBlocks(content) {
+  let inlineResult;
+  let displayResult;
+  const resultList = [];
   for (const regexGroup of settings.inlineMath) {
-    const result = matchMathBlockRegex(content, regexGroup, false);
-    if (result) {
-      return result;
+    inlineResult = matchMathBlockRegex(content, regexGroup, false);
+    if (inlineResult) {
+      break;
     }
   }
   for (const regexGroup of settings.displayMath) {
-    const result = matchMathBlockRegex(content, regexGroup, true);
-    if (result) {
-      return result;
+    displayResult = matchMathBlockRegex(content, regexGroup, true);
+    if (displayResult) {
+      break;
     }
   }
-  return null;
+  if (inlineResult) {
+    if (null === displayResult) {
+      resultList.push(inlineResult);
+    }
+    // If display shows before inline section, keep display only, no
+    // matter two blocks have any intersection.
+    else if (displayResult.index > inlineResult.index) {
+      resultList.push(inlineResult);
+      // Display and inline have intersection, keep inline only.
+      if (displayResult.index < inlineResult.endIndex) {
+        displayResult = null;
+      }
+      // No intersection, two independent matches.
+    }
+  }
+  if (displayResult) {
+    resultList.push(displayResult);
+  }
+  return resultList;
 }
 
 /**
@@ -134,13 +156,24 @@ function renderStage1(content) {
   }
 
   // Render math blocks
-  while ((contentMatch = matchMathBlock(content)) !== null) {
-    const matchLength = contentMatch.content.length;
-    const preparedContent = latexRender.prepareContent(contentMatch.content, contentMatch.latex);
-    const preparedHTML = `<${latexTagName} ${latexTagDisplayAttrName}='${contentMatch.displayMode}'>${escapeHtml(preparedContent)}</${latexTagName}>`;
-    const contentReplacement = getCommentReplaceMarkedText(window.btoa(encodeURIComponent(preparedHTML)));
-    content = content.substring(0, contentMatch.index) + contentReplacement
-      + content.substring(contentMatch.index + matchLength, content.length);
+  let mathMatchs;
+  while ((mathMatchs = matchMathBlocks(content)).length !== 0) {
+    let lastIndex = -1;
+    let lastOffset = 0;
+    for (contentMatch of mathMatchs) {
+      const matchLength = contentMatch.content.length;
+      const preparedContent = latexRender.prepareContent(contentMatch.content, contentMatch.latex);
+      const preparedHTML = `<${latexTagName} ${latexTagDisplayAttrName}='${contentMatch.displayMode}'>${escapeHtml(preparedContent)}</${latexTagName}>`;
+      const contentReplacement = getCommentReplaceMarkedText(window.btoa(encodeURIComponent(preparedHTML)));
+      let contentIndex = contentMatch.index;
+      if (contentMatch.index > lastIndex) {
+        contentIndex += lastOffset;
+      }
+      lastIndex = contentMatch.index;
+      lastOffset = contentReplacement.length - matchLength;
+      content = content.substring(0, contentIndex) + contentReplacement
+        + content.substring(contentIndex + matchLength, content.length);
+    }
   }
 
   // Unprotect content - restore code blocks

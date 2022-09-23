@@ -62,10 +62,10 @@ if (typeof MathJax !== 'undefined' && MathJax) {
     MathJax.Hub.processUpdateDelay = 0;
     latexRender.prepareRender = () => {
       MathJax.Hub.Queue(
-        ['PreProcess',MathJax.Hub],
-        ['resetEquationNumbers',MathJax.InputJax.TeX],
-        ['PreProcess',MathJax.Hub],
-        ['Reprocess',MathJax.Hub]
+        ['PreProcess', MathJax.Hub],
+        ['resetEquationNumbers', MathJax.InputJax.TeX],
+        ['PreProcess', MathJax.Hub],
+        ['Reprocess', MathJax.Hub]
       );
     };
     latexRender.renderElement = (element, displayMode) => {
