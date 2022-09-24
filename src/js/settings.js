@@ -7,7 +7,8 @@ const settings = {
   inlineMath: [['$', '$'], ['\\(', '\\)']],
   displayMath: [['$$', '$$']],
   overflowScroll: true,
-  customOptions: {}
+  beforeInitFunc: () => {},
+  customOptions: {},
 };
 
 if (window) {

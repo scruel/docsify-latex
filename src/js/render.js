@@ -30,6 +30,8 @@ const addReferenceJump = (element) => {
   }
 };
 
+settings.beforeInitFunc();
+
 // - MathJax (V2, V3)
 if (typeof MathJax !== 'undefined' && MathJax) {
   // MathJax configs and functions init
