@@ -163,7 +163,12 @@ function renderStage1(content) {
     for (contentMatch of mathMatchs) {
       const matchLength = contentMatch.content.length;
       const preparedContent = latexRender.prepareContent(contentMatch.content, contentMatch.latex);
-      const preparedHTML = `<${latexTagName} ${latexTagDisplayAttrName}='${contentMatch.displayMode}'>${escapeHtml(preparedContent)}</${latexTagName}>`;
+      const latexElementAttrList = [];
+      latexElementAttrList.push(`${latexTagDisplayAttrName}="${contentMatch.displayMode}"`);
+      if (contentMatch.displayMode && settings.overflowScroll) {
+        latexElementAttrList.push('style="width: 100%;display: inline-block;overflow: auto;"');
+      }
+      const preparedHTML = `<${latexTagName} ${latexElementAttrList.join(' ')}>${escapeHtml(preparedContent)}</${latexTagName}>`;
       const contentReplacement = getCommentReplaceMarkedText(window.btoa(encodeURIComponent(preparedHTML)));
       let contentIndex = contentMatch.index;
       if (contentMatch.index > lastIndex) {

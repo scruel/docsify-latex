@@ -6,6 +6,7 @@ import { coverObject } from './tools';
 const settings = {
   inlineMath: [['$', '$'], ['\\(', '\\)']],
   displayMath: [['$$', '$$']],
+  overflowScroll: true,
   customOptions: {}
 };
 
