@@ -190,6 +190,13 @@ Will be rendered as:
 E=mc^2
 @@
 
+### overflowScroll
+
+- Type: `Boolean`
+- Default: `true`
+
+An option to determine whether to add vertical scroll bars if **equations in display mode** are overflow the screen.
+
 ### customOptions
 
 - Type: `Object`
