@@ -1,16 +1,17 @@
 # Change Log
 
-## 0.4.0
+## 0.4.x
 
 *2022-09-24*
 
 - Add beforeInitFunc option
+- inline mode overflowScroll support
 
 ## 0.3.0
 
 *2022-09-24*
 
-- Add overflowScroll option
+- Add overflowScroll option for display mode
 
 ## 0.2.x
 
