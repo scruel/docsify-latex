@@ -165,8 +165,9 @@ function renderStage1(content) {
       const preparedContent = latexRender.prepareContent(contentMatch.content, contentMatch.latex);
       const latexElementAttrList = [];
       latexElementAttrList.push(`${latexTagDisplayAttrName}="${contentMatch.displayMode}"`);
-      if (contentMatch.displayMode && settings.overflowScroll) {
-        latexElementAttrList.push('style="width: 100%;display: inline-block;overflow: auto;"');
+      if (settings.overflowScroll) {
+        const displayStyle = contentMatch.displayMode ? 'block' : 'inline-grid';
+        latexElementAttrList.push(`style="max-width: 100%;display: ${displayStyle};overflow-x: auto;overflow-y:hidden;"`);
       }
       const preparedHTML = `<${latexTagName} ${latexElementAttrList.join(' ')}>${escapeHtml(preparedContent)}</${latexTagName}>`;
       const contentReplacement = getCommentReplaceMarkedText(window.btoa(encodeURIComponent(preparedHTML)));
