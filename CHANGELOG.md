@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.3.0
+
+*2022-09-24*
+
+- Add overflowScroll option
+
 ## 0.2.x
 
 *2022-09-22* - *2022-09-23*
