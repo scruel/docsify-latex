@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.4.0
+
+*2022-09-24*
+
+- Add beforeInitFunc option
+
 ## 0.3.0
 
 *2022-09-24*
