@@ -82,6 +82,18 @@ $$
 
 ```latex
 $$
+\ce{\color{#FF0000}{H2O}}
+$$
+```
+
+$$
+\ce{\color{#FF0000}{H2O}}
+$$
+
+----
+
+```latex
+$$
 J(\theta )= \frac{1}{2m}\left( {{\theta }^{T}}{{X}^{T}}X\theta -{{\theta}^{T}}{{X}^{T}}y-{{y}^{T}}X\theta + {{y}^{T}}y \right)
 $$
 ```

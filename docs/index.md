@@ -22,12 +22,14 @@ List of integrated engines:
 - [MathJax V2](https://docs.mathjax.org/en/v2.7-latest/index.html)
 - [KaTeX](https://katex.org/docs)
 
-If you want to integrate more, feel free to fire an issue to explain the reason, or more well, you can directly make a pull request.
-
 Supported engine features:
 
 - Equation cross-reference jump (same page only)
-- [Handling complex $\LaTeX$ equations][Documentation Example]
+- Typsetting complex LaTeX content
+
+See [Documentation Example][Documentation Example] page for more details.
+
+> If you want to integrate more engines, feel free to fire an issue to explain the reason, or more well, you can directly make a pull request.
 
 ## Installation
 
@@ -36,16 +38,16 @@ Add JavaScript $\LaTeX$ display engine, and docsify-latex plugin after docsify a
 Template as following:
 
 ```html
-<!-- Docsify Here -->
+<!-- Docsify script Here -->
 
-<!-- LaTeX display engine Here -->
+<!-- LaTeX display engine script Here -->
 
 <script src="//cdn.jsdelivr.net/npm/docsify-latex@latest/dist/docsify-latex.js"></script>
 ```
 
 > Notice:
 >
-> You should put docsify-latex plugin script below docsify and $\LaTeX$ display engine scripts, because plugin script depends on them.
+> You should put docsify-latex plugin script below docsify and $\LaTeX$ display engine scripts, because plugin script **depends on** them.
 >
 > To keep loading scripts in order, you also should remove `async` attribute from the related script elements.
 
@@ -66,7 +68,7 @@ window.$docsify = {
 ### With MathJax
 
 ```html
-<!-- Docsify Here -->
+<!-- Docsify script Here -->
 
 <script src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
@@ -76,7 +78,7 @@ window.$docsify = {
 Or if you prefer MathJax version 2:
 
 ```html
-<!-- Docsify Here -->
+<!-- Docsify script Here -->
 
 <script src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"></script>
 
@@ -86,7 +88,7 @@ Or if you prefer MathJax version 2:
 ### With KaTeX
 
 ```html
-<!-- Docsify Here -->
+<!-- Docsify script Here -->
 
 <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
 <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" />
@@ -112,9 +114,7 @@ $$
 
 > Go to display engine official website for more details about supported $\LaTeX$ functions, you can click links in [Features](#Features) section to visit specific engines documentation website.
 
-### Demos
-
-[Notes-ML-AndrewNg](https://scruel.github.io/Notes-ML-AndrewNg)
+Seeking for demo projects? click [here][Demo Projects] to learn more.
 
 ## Options
 
@@ -197,6 +197,47 @@ E=mc^2
 
 An option to determine whether to add vertical scroll bars if **equations in display mode** are overflow the screen.
 
+### beforeInitFunc
+
+- Type: `Function`
+- Default: `<empty function>`
+
+Configure a function which will be executed **only once** before we set options for display engine, be aware, the engine must already be initialized before we call this function, so you can invoke anything with engine instance.
+
+> Notice:
+>
+> This function should only do some extra configure jobs, for configuration purpose, check [Options#customOptions](#customOptions).
+>
+> Also, since markdown content are not loaded when calling this function, so that you should't typeset anything in this function.
+
+For example, **for MathJax version 2**, you can add [mhchem extension](https://github.com/mhchem/MathJax-mhchem) as following:
+
+```javascript
+window.$docsify = {
+  // ...
+  latex: {
+    // ...
+    beforeInitFunc: () => {
+      MathJax.Ajax.config.path["mhchem"] = "https://cdnjs.cloudflare.com/ajax/libs/mathjax-mhchem/3.3.2";
+    },
+    customOptions: {
+      TeX: {
+        extensions: ["[mhchem]/mhchem.js", "extpfeil.js"],
+      },
+    }
+  }
+};
+```
+
+Notice that you will still can do something as following, instead of using `beforeInitFunc`, though we will not recommend for this way:
+
+```html
+<!-- MathJax script Here -->
+<script>
+  MathJax.Ajax.config.path["mhchem"] = "https://cdnjs.cloudflare.com/ajax/libs/mathjax-mhchem/3.3.2";
+</script>
+```
+
 ### customOptions
 
 - Type: `Object`
@@ -248,7 +289,7 @@ Or if you prefer the official configuration way, you can also keep using:
 
 > Be aware, the options you put here, might will be overrided by the options you put in `customOptions` section, and you should use this before MathJax loaded (as official documentation mentioned), otherwise plugin will obtain the object contains your options rather than MathJax instance.
 >
-> For MathJax version 2, I will levea it blank, I think this example should be enough, you can search doc pages by yourself.
+> For MathJax version 2, `customOptions` will be passed to `MathJax.Hub.Config`, if you need to do more before options set up, please check [Options#beforeInitFunc](#beforeInitFunc).
 
 #### KaTeX
 
@@ -277,5 +318,5 @@ See the [LICENSE](https://github.com/scruel/docsify-latex/blob/master/LICENSE) f
 Copyright (c) Scruel Tao ([@scruel](https://github.com/scruel))
 
 [MathJax]: https://docs.mathjax.org
-[Documentation]: https://scruel.github.io/docsify-latex
 [Documentation Example]: https://scruel.github.io/docsify-latex/#/example
+[Demo Projects]: https://scruel.github.io/docsify-latex/#/demo

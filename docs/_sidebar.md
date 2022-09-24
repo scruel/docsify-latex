@@ -1,3 +1,4 @@
 <!-- markdownlint-disable-next-line first-line-heading -->
-- [docsify-latex](/)
+- [Documentation](/)
 - [Feature Example](/example)
+- [Demo Projects](/demo)

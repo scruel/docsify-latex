@@ -39,7 +39,7 @@ window.$docsify = {
 
 > Notice:
 >
-> You should put docsify-latex plugin script below docsify and LaTeX display engine scripts, because plugin script depends on them.
+> You should put docsify-latex plugin script below docsify and LaTeX display engine scripts, because plugin script **depends on** them.
 >
 > To keep loading scripts in order, you also should remove `async` attribute from the script element.
 
@@ -61,9 +61,7 @@ Go to display engine official website for more details about supported LaTeX fun
 
 See [Documentation site][Documentation] for more usage and more details.
 
-### Demos
-
-[Notes-ML-AndrewNg](https://scruel.github.io/Notes-ML-AndrewNg)
+Seeking for demo projects, click [here][Demo Projects] to learn more.
 
 ## Features
 
@@ -75,12 +73,14 @@ List of integrated engines:
 - [MathJax V2](https://docs.mathjax.org/en/v2.7-latest/index.html)
 - [KaTeX](https://katex.org/docs)
 
-If you want to integrate more, feel free to fire an issue to explain the reason, or more well, you can directly make a pull request.
-
 Supported engine features:
 
 - Equation cross-reference jump (same page only)
-- [Handling complex $\LaTeX$ equations][Documentation Example]
+- Typsetting complex LaTeX content
+
+See [Documentation Example][Documentation Example] for more details.
+
+> If you want to integrate more engines, feel free to fire an issue to explain the reason, or more well, you can directly make a pull request.
 
 ## License
 
@@ -93,3 +93,4 @@ Copyright (c) Scruel Tao ([@scruel](https://github.com/scruel))
 [MathJax]: https://docs.mathjax.org
 [Documentation]: https://scruel.github.io/docsify-latex
 [Documentation Example]: https://scruel.github.io/docsify-latex/#/example
+[Demo Projects]: https://scruel.github.io/docsify-latex/#/demo
