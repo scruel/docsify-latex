@@ -16,18 +16,18 @@ A [docsify.js](https://docsify.js.org) plugin for typesetting $\LaTeX$ with disp
 
 This plugin helps you typeset $\LaTeX$ with some JavaScript $\LaTeX$ display engines.
 
-List of integrated engines:
-
-- [MathJax V3](https://docs.mathjax.org/)
-- [MathJax V2](https://docs.mathjax.org/en/v2.7-latest/index.html)
-- [KaTeX](https://katex.org/docs)
-
-Supported engine features:
+**Supported engine features**:
 
 - Equation cross-reference jump (same page only)
 - Typsetting complex LaTeX content
 
 See [Documentation Example][Documentation Example] page for more details.
+
+**List of integrated engines**:
+
+- [MathJax V3](https://docs.mathjax.org/)
+- [MathJax V2](https://docs.mathjax.org/en/v2.7-latest/index.html)
+- [KaTeX](https://katex.org/docs)
 
 > If you want to integrate more engines, feel free to fire an issue to explain the reason, or more well, you can directly make a pull request.
 
@@ -42,7 +42,7 @@ Template as following:
 
 <!-- LaTeX display engine script Here -->
 
-<script src="//cdn.jsdelivr.net/npm/docsify-latex@latest/dist/docsify-latex.js"></script>
+<script src="//cdn.jsdelivr.net/npm/docsify-latex@0/dist/docsify-latex.js"></script>
 ```
 
 > Notice:
@@ -72,7 +72,7 @@ window.$docsify = {
 
 <script src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-<script src="//cdn.jsdelivr.net/npm/docsify-latex@latest/dist/docsify-latex.js"></script>
+<script src="//cdn.jsdelivr.net/npm/docsify-latex@0/dist/docsify-latex.js"></script>
 ```
 
 Or if you prefer MathJax version 2:
@@ -82,7 +82,7 @@ Or if you prefer MathJax version 2:
 
 <script src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"></script>
 
-<script src="//cdn.jsdelivr.net/npm/docsify-latex@latest/dist/docsify-latex.js"></script>
+<script src="//cdn.jsdelivr.net/npm/docsify-latex@0/dist/docsify-latex.js"></script>
 ```
 
 ### With KaTeX
@@ -93,7 +93,7 @@ Or if you prefer MathJax version 2:
 <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
 <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" />
 
-<script src="//cdn.jsdelivr.net/npm/docsify-latex@latest/dist/docsify-latex.js"></script>
+<script src="//cdn.jsdelivr.net/npm/docsify-latex@0/dist/docsify-latex.js"></script>
 ```
 
 > Notice:

@@ -14,7 +14,7 @@ A [docsify.js](https://docsify.js.org) plugin for typesetting LaTeX with display
 
 Add JavaScript LaTeX display engine, and docsify-latex plugin after docsify and engine scirpts all to your `index.html`.
 
-For example, I recommend [MathJax][MathJax], and load scripts from the content delivery network (CDN):
+For example, I prefer [MathJax][MathJax], and load scripts from the content delivery network (CDN):
 
 ```html
 <!-- Docsify v4 -->
@@ -22,7 +22,7 @@ For example, I recommend [MathJax][MathJax], and load scripts from the content d
 <!-- LaTeX display engine -->
 <script src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <!--  docsify-latex plugin -->
-<script src="//cdn.jsdelivr.net/npm/docsify-latex@latest/dist/docsify-latex.js"></script>
+<script src="//cdn.jsdelivr.net/npm/docsify-latex@0/dist/docsify-latex.js"></script>
 ```
 
 Configure latex plugin options:
@@ -67,18 +67,18 @@ Seeking for demo projects, click [here][Demo Projects] to learn more.
 
 This plugin helps you typeset LaTeX with some JavaScript LaTeX display engines.
 
-List of integrated engines:
-
-- [MathJax V3](https://docs.mathjax.org/)
-- [MathJax V2](https://docs.mathjax.org/en/v2.7-latest/index.html)
-- [KaTeX](https://katex.org/docs)
-
-Supported engine features:
+**Supported engine features**:
 
 - Equation cross-reference jump (same page only)
 - Typsetting complex LaTeX content
 
 See [Documentation Example][Documentation Example] for more details.
+
+**List of integrated engines**:
+
+- [MathJax V3](https://docs.mathjax.org/)
+- [MathJax V2](https://docs.mathjax.org/en/v2.7-latest/index.html)
+- [KaTeX](https://katex.org/docs)
 
 > If you want to integrate more engines, feel free to fire an issue to explain the reason, or more well, you can directly make a pull request.
 
