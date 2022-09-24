@@ -6,6 +6,7 @@
 
 - Add beforeInitFunc option
 - inline mode overflowScroll support
+- Code refactor & Fixes
 
 ## 0.3.0
 
