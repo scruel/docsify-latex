@@ -5,6 +5,10 @@
 [![GitHub Workflow Status (master)](https://img.shields.io/github/workflow/status/scruel/docsify-latex/Build/master?label=checks&style=flat-square)](https://github.com/scruel/docsify-latex/actions?query=branch%3Amaster+)
 [![jsDelivr](https://data.jsdelivr.com/v1/package/npm/docsify-latex/badge)](https://www.jsdelivr.com/package/npm/docsify-latex)
 
+<blockquote>
+Plugin vesrion in use: <span id="docsify-latex-version"></span> (for current page)
+</blockquote>
+
 A [docsify.js](https://docsify.js.org) plugin for typesetting $\LaTeX$ with display engines from markdown.
 
 <br/>
@@ -20,6 +24,7 @@ This plugin helps you typeset $\LaTeX$ with some JavaScript $\LaTeX$ display eng
 
 - Equation cross-reference jump (same page only)
 - Typsetting complex LaTeX content
+- Overflowed content scroll bar
 
 See [Documentation Example][Documentation Example] page for more details.
 
@@ -195,7 +200,7 @@ E=mc^2
 - Type: `Boolean`
 - Default: `true`
 
-An option to determine whether to add vertical scroll bars if **equations in display mode** are overflow the screen.
+An option to determine whether to add vertical scroll bars if equations are overflow the screen.
 
 ### beforeInitFunc
 
@@ -320,3 +325,7 @@ Copyright (c) Scruel Tao ([@scruel](https://github.com/scruel))
 [MathJax]: https://docs.mathjax.org
 [Documentation Example]: https://scruel.github.io/docsify-latex/#/example
 [Demo Projects]: https://scruel.github.io/docsify-latex/#/demo
+
+<script>
+  document.getElementById("docsify-latex-version").innerHTML = window.$docsify.latex.version;
+</script>

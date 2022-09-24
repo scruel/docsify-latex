@@ -1,8 +1,14 @@
-# Example
+# Feature Example
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://github.com/scruel/docsify-latex/blob/master/LICENSE)
 [![NPM](https://img.shields.io/npm/v/docsify-latex.svg?style=flat-square)](https://www.npmjs.com/package/docsify-latex)
 [![jsDelivr](https://data.jsdelivr.com/v1/package/npm/docsify-latex/badge)](https://www.jsdelivr.com/package/npm/docsify-latex)
+
+<blockquote>
+Plugin vesrion: <span id="docsify-latex-version"></span> (for current page)
+
+This page might contains some new features, so make sure you can see docsify-latex latest version above, otherwise please try to clear your cache then refresh the page.
+</blockquote>
 
 ## Complex Content
 
@@ -11,6 +17,41 @@ Price (\$) for house ($y$)
 ```
 
 Price (\$) for house ($y$)
+
+----
+
+Long equation:
+
+```latex
+Inline mode: $J(\theta )= \frac{1}{2m}\left( {{\theta }^{T}}{{X}^{T}}X\theta -{{\theta}^{T}}{{X}^{T}}y-{{y}^{T}}X\theta + {{y}^{T}}y \right) $ equation.
+
+Inline mode: $J(\theta) = - \frac{1}{m} \sum_{i=1}^m [ y^{(i)}\ \log (h_\theta (x^{(i)})) + (1 - y^{(i)})\ \log (1 - h_\theta(x^{(i)}))] + \frac{\lambda}{2m}\sum_{j=1}^n \theta_j^2$ equation 2.
+
+Display mode:
+$$
+J(\theta) = - \frac{1}{m} \sum_{i=1}^m [ y^{(i)}\ \log (h_\theta (x^{(i)})) + (1 - y^{(i)})\ \log (1 - h_\theta(x^{(i)}))] + \frac{\lambda}{2m}\sum_{j=1}^n \theta_j^2
+$$
+
+
+Display mode with tag:
+$$
+J(\theta) = - \frac{1}{m} \sum_{i=1}^m [ y^{(i)}\ \log (h_\theta (x^{(i)})) + (1 - y^{(i)})\ \log (1 - h_\theta(x^{(i)}))] + \frac{\lambda}{2m}\sum_{j=1}^n \theta_j^2\tag{DIS}\label{eq:dis}
+$$
+```
+
+In inline mode: $J(\theta )= \frac{1}{2m}\left( {{\theta }^{T}}{{X}^{T}}X\theta -{{\theta}^{T}}{{X}^{T}}y-{{y}^{T}}X\theta + {{y}^{T}}y \right) $ equation.
+
+Inline mode: $J(\theta) = - \frac{1}{m} \sum_{i=1}^m [ y^{(i)}\ \log (h_\theta (x^{(i)})) + (1 - y^{(i)})\ \log (1 - h_\theta(x^{(i)}))] + \frac{\lambda}{2m}\sum_{j=1}^n \theta_j^2$ equation 2.
+
+Display mode:
+$$
+J(\theta) = - \frac{1}{m} \sum_{i=1}^m [ y^{(i)}\ \log (h_\theta (x^{(i)})) + (1 - y^{(i)})\ \log (1 - h_\theta(x^{(i)}))] + \frac{\lambda}{2m}\sum_{j=1}^n \theta_j^2
+$$
+
+Display mode with tag:
+$$
+J(\theta) = - \frac{1}{m} \sum_{i=1}^m [ y^{(i)}\ \log (h_\theta (x^{(i)})) + (1 - y^{(i)})\ \log (1 - h_\theta(x^{(i)}))] + \frac{\lambda}{2m}\sum_{j=1}^n \theta_j^2\tag{DIS}\label{eq:dis}
+$$
 
 ----
 
@@ -52,6 +93,8 @@ $$
 
 ----
 
+Labeled equation:
+
 ```latex
 $x+y^{2x}\tag*{MEE}\label{mee}$
 ```
@@ -84,26 +127,16 @@ $$
 
 ----
 
+Colored chemical formula:
+
 ```latex
 $$
-\ce{\color{#FF0000}{H2O}}
+\ce{\color{#0000FF}{H2O}}
 $$
 ```
 
 $$
-\ce{\color{#FF0000}{H2O}}
-$$
-
-----
-
-```latex
-$$
-J(\theta )= \frac{1}{2m}\left( {{\theta }^{T}}{{X}^{T}}X\theta -{{\theta}^{T}}{{X}^{T}}y-{{y}^{T}}X\theta + {{y}^{T}}y \right)
-$$
-```
-
-$$
-J(\theta )= \frac{1}{2m}\left( {{\theta }^{T}}{{X}^{T}}X\theta -{{\theta}^{T}}{{X}^{T}}y-{{y}^{T}}X\theta + {{y}^{T}}y \right)
+\ce{\color{#0000FF}{H2O}}
 $$
 
 ----
@@ -112,13 +145,13 @@ $$
 
 > For MathJax, [Automatic Equation Numbering](https://docs.mathjax.org/en/latest/input/tex/eqnumbers.html) need to be manually turn on.
 >
-> For KaTeX, cross-reference is a workaround come from KaTeX#2003, not supported officially.
+> For KaTeX, cross-reference is a workaround come from [KaTeX#2003](https://github.com/KaTeX/KaTeX/issues/2003), it's not officially supported.
 >
 > Usage:
 >
-> Reference before and after equation defined use `\ref` or `eqref`:
+> Use automatic equation numbering functions or use `\tag` and `\label` to define the equation.
 >
-> Use automatic equation numbering or use `\tag` and `\label` to define the equation.
+> Reference before or after defined equation use `\ref` or `eqref`:
 >
 > For more details, you should check the website of the engine you are using.
 
@@ -140,3 +173,7 @@ $$
   \label{eq:sample}
 \end{equation}
 $$
+
+<script>
+  document.getElementById("docsify-latex-version").innerHTML = window.$docsify.latex.version;
+</script>

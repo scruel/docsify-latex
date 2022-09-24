@@ -71,6 +71,7 @@ This plugin helps you typeset LaTeX with some JavaScript LaTeX display engines.
 
 - Equation cross-reference jump (same page only)
 - Typsetting complex LaTeX content
+- Overflowed content scroll bar
 
 See [Documentation Example][Documentation Example] for more details.
 
