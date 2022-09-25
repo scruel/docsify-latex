@@ -28,7 +28,28 @@ function getBlockRegex(matchStartRegex, matchEndRegex, needMatchMultipleLine) {
   matchStartRegex = escapeRegex(matchStartRegex);
   matchEndRegex = escapeRegex(matchEndRegex);
   // Matches markdown inline math
-  return new RegExp(`(?<=[^\\\\]|^)${matchStartRegex}(([^\\\\${needMatchMultipleLine ? '' : '\n'}]|\\\\.)+?)${matchEndRegex}`);
+  return new RegExp(`(?:[^\\\\]|^)(${matchStartRegex}(([^\\\\${needMatchMultipleLine ? '' : '\n'}]|\\\\.)+?)${matchEndRegex})`);
+}
+
+function matchByRegexArray(content, regexGroup, displayMode = false) {
+  const mathRegex = getBlockRegex(regexGroup[0], regexGroup[1], displayMode);
+  return matchByRegex(content, mathRegex, displayMode);
+}
+
+function matchByRegex(content, regex, displayMode = false) {
+  const matchResult = content.match(regex);
+  if (matchResult) {
+    const result = {};
+    result.displayMode = displayMode;
+    result.content = matchResult[1];
+    result.innerContent = matchResult[2];
+    result.index = matchResult.index + matchResult[0].length - result.content.length;
+    result.endIndex = result.index + result.content.length;
+    // For debug only
+    result.regex = regex;
+    return result;
+  }
+  return null;
 }
 
 const codePlaceholder = 'CODE';
@@ -54,35 +75,19 @@ const regex = {
 
 // Match functions
 // =============================================================================
-function matchMathBlockRegex(content, regexGroup, displayMode){
-  const mathRegex = getBlockRegex(regexGroup[0], regexGroup[1], displayMode);
-  const matchResult = content.match(mathRegex);
-  if (matchResult) {
-    const result = {};
-    result.displayMode = displayMode;
-    result.index = matchResult.index;
-    result.content = matchResult[0];
-    result.latex = matchResult[1];
-    result.endIndex = result.index + result.content.length;
-    // For debug only
-    result.regex = mathRegex;
-    return result;
-  }
-  return null;
-}
 
 function matchMathBlocks(content) {
   let inlineResult;
   let displayResult;
   const resultList = [];
   for (const regexGroup of settings.inlineMath) {
-    inlineResult = matchMathBlockRegex(content, regexGroup, false);
+    inlineResult = matchByRegexArray(content, regexGroup, false);
     if (inlineResult) {
       break;
     }
   }
   for (const regexGroup of settings.displayMath) {
-    displayResult = matchMathBlockRegex(content, regexGroup, true);
+    displayResult = matchByRegexArray(content, regexGroup, true);
     if (displayResult) {
       break;
     }
@@ -120,12 +125,11 @@ function matchMathBlocks(content) {
  * @param {*} markerList
  * @returns
  */
-function matchReplacedConent(content, contentMatch, matchIndexForReplace, placeholder='') {
-  const matchLength = contentMatch[0].length;
-  const replaceContent = contentMatch[matchIndexForReplace];
-  const commentedConent = getCommentReplaceMarkedText(window.btoa(encodeURIComponent(replaceContent)), `${placeholder}`);
+function matchReplacedConent(content, contentMatch, placeholder='') {
+  const contentLength = contentMatch.content.length;
+  const commentedConent = getCommentReplaceMarkedText(window.btoa(encodeURIComponent(contentMatch.content)), `${placeholder}`);
   content = content.substring(0, contentMatch.index) + commentedConent
-    + content.substring(contentMatch.index + matchLength, content.length);
+    + content.substring(contentMatch.index + contentLength, content.length);
   return content;
 }
 
@@ -145,14 +149,14 @@ function renderStage1(content) {
   // These markers are replaced with their associated code blocs after
   // blocks have been processed.
   // WARN: Do not change the order of matches!
-  while ((contentMatch = content.match(regex.codeTagMarkup)) !== null) {
-    content = matchReplacedConent(content, contentMatch, 0, codePlaceholder);
+  while ((contentMatch = matchByRegex(content, regex.codeTagMarkup)) !== null) {
+    content = matchReplacedConent(content, contentMatch, codePlaceholder);
   }
-  while ((contentMatch = content.match(regex.codeBlockMarkup)) !== null) {
-    content = matchReplacedConent(content, contentMatch, 0, codePlaceholder);
+  while ((contentMatch = matchByRegex(content, regex.codeBlockMarkup)) !== null) {
+    content = matchReplacedConent(content, contentMatch, codePlaceholder);
   }
-  while ((contentMatch = content.match(regex.codeInlineMarkup)) !== null) {
-    content = matchReplacedConent(content, contentMatch, 0, codePlaceholder);
+  while ((contentMatch = matchByRegex(content, regex.codeInlineMarkup)) !== null) {
+    content = matchReplacedConent(content, contentMatch, codePlaceholder);
   }
 
   // Render math blocks
@@ -162,7 +166,7 @@ function renderStage1(content) {
     let lastOffset = 0;
     for (contentMatch of mathMatchs) {
       const matchLength = contentMatch.content.length;
-      const preparedContent = latexRender.prepareContent(contentMatch.content, contentMatch.latex);
+      const preparedContent = latexRender.prepareContent(contentMatch.content, contentMatch.innerContent);
       const latexElementAttrList = [];
       latexElementAttrList.push(`${latexTagDisplayAttrName}="${contentMatch.displayMode}"`);
       if (settings.overflowScroll) {
