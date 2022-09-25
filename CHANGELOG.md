@@ -2,7 +2,7 @@
 
 ## 0.4.x
 
-*2022-09-24* ~ *2022-09-25*
+*2022-09-24* ~ *2022-09-26*
 
 - Add beforeInitFunc option
 - inline mode overflowScroll support

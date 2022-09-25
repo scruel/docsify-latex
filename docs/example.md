@@ -131,12 +131,12 @@ Colored chemical formula:
 
 ```latex
 $$
-\ce{\color{#0000FF}{H2O}}
+\ce{\color{#0B87DA}{H2O}}
 $$
 ```
 
 $$
-\ce{\color{#0000FF}{H2O}}
+\ce{\color{#0B87DA}{H2O}}
 $$
 
 ----
