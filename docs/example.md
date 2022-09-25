@@ -5,7 +5,7 @@
 [![jsDelivr](https://data.jsdelivr.com/v1/package/npm/docsify-latex/badge)](https://www.jsdelivr.com/package/npm/docsify-latex)
 
 <blockquote>
-Plugin vesrion: <span id="docsify-latex-version"></span> (for current page)
+Plugin vesrion: <span id="docsify-latex-version"></span> (on current page)
 
 This page might contains some new features, so make sure you can see docsify-latex latest version above, otherwise please try to clear your cache then refresh the page.
 </blockquote>

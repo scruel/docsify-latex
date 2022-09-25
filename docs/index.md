@@ -6,7 +6,7 @@
 [![jsDelivr](https://data.jsdelivr.com/v1/package/npm/docsify-latex/badge)](https://www.jsdelivr.com/package/npm/docsify-latex)
 
 <blockquote>
-Plugin vesrion in use: <span id="docsify-latex-version"></span> (for current page)
+Plugin vesrion in use: <span id="docsify-latex-version"></span> (on current page)
 </blockquote>
 
 A [docsify.js](https://docsify.js.org) plugin for typesetting $\LaTeX$ with display engines from markdown.
