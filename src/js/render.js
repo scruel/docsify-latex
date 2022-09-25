@@ -19,6 +19,13 @@ const addReferenceJump = (element) => {
     return;
   }
   for (const linkElement of elements) {
+    // TODO: custom
+    // Color set
+    if (!Object.prototype.hasOwnProperty.call(linkElement.style, 'color')
+       || !linkElement.style.color) {
+      linkElement.style.color = '#00F';
+    }
+    // Add jump
     const hrefAttr = linkElement.getAttribute('href');
     const refId = decodeURIComponent(hrefAttr).substring(1);
     if (hrefAttr.startsWith('#')) {

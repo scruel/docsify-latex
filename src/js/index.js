@@ -176,8 +176,8 @@ function renderStage1(content) {
       const latexElementAttrList = [];
       latexElementAttrList.push(`${latexTagDisplayAttrName}="${contentMatch.displayMode}"`);
       if (settings.overflowScroll) {
-        const displayStyle = contentMatch.displayMode ? 'block' : 'inline-grid';
-        latexElementAttrList.push(`style="max-width: 100%;display: ${displayStyle};overflow-x: auto;overflow-y:hidden;"`);
+        const displayStyle = contentMatch.displayMode ? 'block' : 'inline-flex';
+        latexElementAttrList.push(`style="max-width: 100%;display: ${displayStyle};overflow: auto hidden;"`);
       }
       const preparedHTML = `<${latexTagName} ${latexElementAttrList.join(' ')}>${escapeHtml(preparedContent)}</${latexTagName}>`;
       const contentReplacement = getCommentReplaceMarkedText(window.btoa(encodeURIComponent(preparedHTML)));
