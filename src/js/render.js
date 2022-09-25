@@ -50,7 +50,12 @@ if (typeof MathJax !== 'undefined' && MathJax) {
     MathJax.startup.getComponents();
     latexRender.prepareRender = () => {
       MathJax.startup.getComponents();
-      MathJax.startup.output.clearCache();
+      const OUTPUT = MathJax.startup.output;
+      if (typeof OUTPUT.clearCache !== 'undefined') {
+        OUTPUT.clearCache();
+      } else  if (typeof OUTPUT.clearFontCache !== 'undefined') {
+        OUTPUT.clearFontCache();
+      }
     };
     latexRender.renderElement = async (element, displayMode) => {
       await MathJax.typesetPromise([element]);
