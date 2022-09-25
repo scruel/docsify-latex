@@ -23,12 +23,18 @@ function getCommentReplaceMarkupRegex(placeholder='') {
   return new RegExp(`<!-- ${commentReplaceMark} ${placeholder} (.*?) -->`);
 }
 
-function getBlockRegex(matchStartRegex, matchEndRegex, needMatchMultipleLine) {
+function getBlockRegex(matchStartRegex, matchEndRegex, needMatchMultipleLine, escape = true) {
   // Escape string according to regex syntax
-  matchStartRegex = escapeRegex(matchStartRegex);
-  matchEndRegex = escapeRegex(matchEndRegex);
+  if (escape) {
+    matchStartRegex = escapeRegex(matchStartRegex);
+    matchEndRegex = escapeRegex(matchEndRegex);
+  }
   // Matches markdown inline math
-  return new RegExp(`(?:[^\\\\]|^)(${matchStartRegex}(([^\\\\${needMatchMultipleLine ? '' : '\n'}]|\\\\.)+?)${matchEndRegex})`);
+  // Group 0: whole match result
+  // Group 1: content (with matchRegexs)
+  // Group 2: matchStartRegex match result
+  // Group 3: inner content (with matchRegexs)
+  return new RegExp(`(?:^|[^\\\\])((${matchStartRegex})((?:[^\\\\${needMatchMultipleLine ? '' : '\n'}]|\\\\.)+?)${matchEndRegex})`);
 }
 
 function matchByRegexArray(content, regexGroup, displayMode = false) {
@@ -42,7 +48,7 @@ function matchByRegex(content, regex, displayMode = false) {
     const result = {};
     result.displayMode = displayMode;
     result.content = matchResult[1];
-    result.innerContent = matchResult[2];
+    result.innerContent = matchResult[3];
     result.index = matchResult.index + matchResult[0].length - result.content.length;
     result.endIndex = result.index + result.content.length;
     // For debug only
@@ -61,11 +67,11 @@ const regex = {
 
   // Matches markdown code blocks (inline and multi-line)
   // Example: ```CODE```
-  codeBlockMarkup: getBlockRegex('```', '```', true),
+  codeBlockMarkup: getBlockRegex('`{3,}', '\\2', true, false),
 
   // Matches markdown inline code
   // Example: `CODE`
-  codeInlineMarkup: getBlockRegex('`', '`', false),
+  codeInlineMarkup: getBlockRegex('`{1,}', '\\2', false, false),
 
   commentDeleteReplaceMarkup: /^(>?[ ]*)<!--/gm,
 
@@ -159,7 +165,7 @@ function renderStage1(content) {
     content = matchReplacedConent(content, contentMatch, codePlaceholder);
   }
 
-  // Render math blocks
+  // Render math blocks without code symbol `
   let mathMatchs;
   while ((mathMatchs = matchMathBlocks(content)).length !== 0) {
     let lastIndex = -1;
