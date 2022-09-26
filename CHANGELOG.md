@@ -1,10 +1,11 @@
 # Change Log
 
-## 0.5.0
+## 0.5.x
 
 *2022-09-26*
 
 - Enhance cross-reference
+- Code refactor & Fixes
 
 ## 0.4.x
 
