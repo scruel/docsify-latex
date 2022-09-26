@@ -62,6 +62,23 @@ if (typeof MathJax !== 'undefined' && MathJax) {
     };
     latexRender.afterRender = () => {
       addReferenceJump(document);
+      // Fix https://github.com/mathjax/MathJax/issues/2936
+      const latexElements = document.querySelectorAll('docsify-latex');
+      for (const latexElement of latexElements) {
+        const mjxMathEle = latexElement.querySelector('mjx-math');
+        if (mjxMathEle === null) {
+          continue;
+        }
+        mjxMathEle.style.width = '';
+        const mjxMathWidth = mjxMathEle.getBoundingClientRect().width;
+        
+        let mjxMllWidth = 0;
+        const mjxMllEle = latexElement.querySelector('mjx-assistive-mml');
+        if (mjxMathEle !== null) {
+          mjxMllWidth = mjxMllEle.getBoundingClientRect().width;
+        }
+        latexElement.style.width = Math.max(mjxMathWidth, mjxMllWidth) + 'px';
+      }
     };
   } else if (MathJax.version[0] === '2') {
     const options = {
