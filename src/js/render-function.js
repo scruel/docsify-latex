@@ -3,11 +3,12 @@
 import { latexTagName, latexBackTagName } from './constant';
 
 // TODO: custom
+const jumpToTitle = 'Jump to equation';
+const gobackTitle = 'Back To Reference';
 const linkColor = '#0B87DA';
 
 // Implementation
 // =============================================================================
-
 export function addReferenceJump(element) {
   const elements = element.querySelectorAll(`${latexTagName} a[href]`);
   if (elements === null || elements.length === 0) {
@@ -22,6 +23,7 @@ export function addReferenceJump(element) {
     const hrefAttr = linkElement.getAttribute('href');
     const refId = decodeURIComponent(hrefAttr).substring(1);
     if (hrefAttr.startsWith('#')) {
+      linkElement.title = jumpToTitle;
       linkElement.onclick = () => {
         const referedEle = document.getElementById(refId);
         if (null === referedEle) {
@@ -40,14 +42,11 @@ export function addReferenceJump(element) {
         if (null === backToEle) {
           backToEle = document.createElement(latexBackTagName);
           referedLatexEle.append(backToEle);
-          // TODO: custom text
-          const text = 'Back To Reference';
-          backToEle.innerHTML = `<a href onclick="return false;">${text}</a>`;
+          backToEle.innerHTML = `<a href onclick="return false;">${gobackTitle}</a>`;
           backToEle.style.color = linkColor;
           backToEle.style.float = 'right';
         }
         const currentPosition = document.documentElement.scrollTop;
-
         backToEle.style.display = '';
         backToEle.onclick = () => {
           backToEle.style.display = 'none';
@@ -55,8 +54,7 @@ export function addReferenceJump(element) {
           return false;
         };
 
-        // Scroll into view
-        referedLatexEle.scrollIntoView();
+        window.scrollTo(0, referedLatexEle.offsetTop - linkElement.getBoundingClientRect().top);
         return false;
       };
     }
