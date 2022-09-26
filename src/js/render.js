@@ -1,7 +1,9 @@
 // Math display engine integration
 // =============================================================================
 import settings from './settings';
+import { latexTagName } from './constant';
 import { coverObject, unescapeHtml } from './tools';
+import { addReferenceJump } from './render-function';
 
 // Template
 // =============================================================================
@@ -13,29 +15,6 @@ latexRender.afterRender = () => {};
 
 // Implementation
 // =============================================================================
-const addReferenceJump = (element) => {
-  const elements = element.querySelectorAll('docsify-latex a[href]');
-  if (elements === null || elements.length === 0) {
-    return;
-  }
-  for (const linkElement of elements) {
-    // TODO: custom
-    // Color set
-    if (!Object.prototype.hasOwnProperty.call(linkElement.style, 'color')
-       || !linkElement.style.color) {
-      linkElement.style.color = '#00F';
-    }
-    // Add jump
-    const hrefAttr = linkElement.getAttribute('href');
-    const refId = decodeURIComponent(hrefAttr).substring(1);
-    if (hrefAttr.startsWith('#')) {
-      linkElement.onclick = () => {
-        document.getElementById(refId).scrollIntoView();
-        return false;
-      };
-    }
-  }
-};
 
 settings.beforeInitFunc();
 
@@ -63,7 +42,7 @@ if (typeof MathJax !== 'undefined' && MathJax) {
     latexRender.afterRender = () => {
       addReferenceJump(document);
       // Fix https://github.com/mathjax/MathJax/issues/2936
-      const latexElements = document.querySelectorAll('docsify-latex');
+      const latexElements = document.querySelectorAll(latexTagName);
       for (const latexElement of latexElements) {
         const mjxMathEle = latexElement.querySelector('mjx-math');
         if (mjxMathEle === null) {
@@ -71,7 +50,7 @@ if (typeof MathJax !== 'undefined' && MathJax) {
         }
         mjxMathEle.style.width = '';
         const mjxMathWidth = mjxMathEle.getBoundingClientRect().width;
-        
+
         let mjxMllWidth = 0;
         const mjxMllEle = latexElement.querySelector('mjx-assistive-mml');
         if (mjxMathEle !== null) {

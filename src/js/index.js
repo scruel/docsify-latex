@@ -3,14 +3,12 @@
 import settings from './settings';
 import latexRender from './render';
 import { escapeHtml, escapeRegex } from './tools';
+import { latexTagName, latexTagDisplayAttrName } from './constant';
 
 // Constants and variables
 // =============================================================================
 const commentReplaceMark = 'latex:replace';
 const deleteReplaceMark = 'latex:delete';
-
-const latexTagName = 'docsify-latex';
-const latexTagDisplayAttrName = 'display';
 
 // Regex rules Init
 // =============================================================================
