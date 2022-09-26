@@ -1,8 +1,8 @@
 # docsify-latex
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://github.com/scruel/docsify-latex/blob/master/LICENSE)
-[![NPM](https://img.shields.io/npm/v/docsify-latex.svg?style=flat-square)](https://www.npmjs.com/package/docsify-latex)
 [![GitHub Workflow Status (master)](https://img.shields.io/github/workflow/status/scruel/docsify-latex/Build/master?label=checks&style=flat-square)](https://github.com/scruel/docsify-latex/actions?query=branch%3Amaster+)
+[![NPM](https://img.shields.io/npm/v/docsify-latex.svg?style=flat-square)](https://www.npmjs.com/package/docsify-latex)
 [![jsDelivr](https://data.jsdelivr.com/v1/package/npm/docsify-latex/badge)](https://www.jsdelivr.com/package/npm/docsify-latex)
 
 A [docsify.js](https://docsify.js.org) plugin for typesetting LaTeX with display engines from markdown.
@@ -22,7 +22,7 @@ For example, I prefer [MathJax][MathJax], and load scripts from the content deli
 <!-- LaTeX display engine -->
 <script src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <!--  docsify-latex plugin -->
-<script src="//cdn.jsdelivr.net/npm/docsify-latex@0/dist/docsify-latex.js"></script>
+<script src="//cdn.jsdelivr.net/npm/docsify-latex@0"></script>
 ```
 
 Configure latex plugin options:

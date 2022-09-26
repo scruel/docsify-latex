@@ -16,7 +16,7 @@ import { terser } from 'rollup-plugin-terser';
 // =============================================================================
 // Copyright
 const currentYear = (new Date()).getFullYear();
-const releaseYear = 2018;
+const releaseYear = 2022;
 
 // Output
 const entryFile = path.resolve(__dirname, 'src', 'js', 'index.js');

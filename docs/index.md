@@ -1,12 +1,12 @@
 # docsify-latex
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://github.com/scruel/docsify-latex/blob/master/LICENSE)
-[![NPM](https://img.shields.io/npm/v/docsify-latex.svg?style=flat-square)](https://www.npmjs.com/package/docsify-latex)
 [![GitHub Workflow Status (master)](https://img.shields.io/github/workflow/status/scruel/docsify-latex/Build/master?label=checks&style=flat-square)](https://github.com/scruel/docsify-latex/actions?query=branch%3Amaster+)
+[![NPM](https://img.shields.io/npm/v/docsify-latex.svg?style=flat-square)](https://www.npmjs.com/package/docsify-latex)
 [![jsDelivr](https://data.jsdelivr.com/v1/package/npm/docsify-latex/badge)](https://www.jsdelivr.com/package/npm/docsify-latex)
 
 <blockquote>
-Plugin vesrion in use: <span id="docsify-latex-version"></span> (on current page)
+Plugin vesrion: <span id="docsify-latex-version"></span> (on current page)
 </blockquote>
 
 A [docsify.js](https://docsify.js.org) plugin for typesetting $\LaTeX$ with display engines from markdown.
@@ -47,7 +47,7 @@ Template as following:
 
 <!-- LaTeX display engine script Here -->
 
-<script src="//cdn.jsdelivr.net/npm/docsify-latex@0/dist/docsify-latex.js"></script>
+<script src="//cdn.jsdelivr.net/npm/docsify-latex@0"></script>
 ```
 
 > Notice:
@@ -77,7 +77,7 @@ window.$docsify = {
 
 <script src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-<script src="//cdn.jsdelivr.net/npm/docsify-latex@0/dist/docsify-latex.js"></script>
+<script src="//cdn.jsdelivr.net/npm/docsify-latex@0"></script>
 ```
 
 Or if you prefer MathJax version 2:
@@ -87,7 +87,7 @@ Or if you prefer MathJax version 2:
 
 <script src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"></script>
 
-<script src="//cdn.jsdelivr.net/npm/docsify-latex@0/dist/docsify-latex.js"></script>
+<script src="//cdn.jsdelivr.net/npm/docsify-latex@0"></script>
 ```
 
 ### With KaTeX
@@ -98,7 +98,7 @@ Or if you prefer MathJax version 2:
 <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
 <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" />
 
-<script src="//cdn.jsdelivr.net/npm/docsify-latex@0/dist/docsify-latex.js"></script>
+<script src="//cdn.jsdelivr.net/npm/docsify-latex@0"></script>
 ```
 
 > Notice:
