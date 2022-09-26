@@ -42,6 +42,9 @@ if (typeof MathJax !== 'undefined' && MathJax) {
     latexRender.afterRender = () => {
       addReferenceJump(document);
       // Fix https://github.com/mathjax/MathJax/issues/2936
+      if (!settings.overflowScroll) {
+        return;
+      }
       const latexElements = document.querySelectorAll(latexTagName);
       for (const latexElement of latexElements) {
         const mjxMathEle = latexElement.querySelector('mjx-math');
