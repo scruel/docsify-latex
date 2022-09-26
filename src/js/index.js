@@ -137,6 +137,16 @@ function matchReplacedConent(content, contentMatch, placeholder='') {
   return content;
 }
 
+function getCodeRestoredContent(content) {
+  let contentMatch;
+  while ((contentMatch = regex.commentCodeReplaceMarkup.exec(content)) !== null) {
+    const commentMark = contentMatch[0];
+    const originalContent = contentMatch[1] || '';
+    content = content.replace(commentMark, () => (decodeURIComponent(window.atob(originalContent))));
+  }
+  return content;
+}
+
 /**
  * Converts LaTeX content into "stage 1" markup. Stage 1 markup contains temporary
  * comments which are replaced with HTML during Stage 2. This approach allows
@@ -170,7 +180,8 @@ function renderStage1(content) {
     let lastOffset = 0;
     for (contentMatch of mathMatchs) {
       const matchLength = contentMatch.content.length;
-      const preparedContent = latexRender.prepareContent(contentMatch.content, contentMatch.innerContent);
+      let preparedContent = latexRender.prepareContent(contentMatch.content, contentMatch.innerContent);
+      preparedContent = getCodeRestoredContent(preparedContent);
       const latexElementAttrList = [];
       latexElementAttrList.push(`${latexTagDisplayAttrName}="${contentMatch.displayMode}"`);
       if (settings.overflowScroll) {
@@ -190,12 +201,8 @@ function renderStage1(content) {
     }
   }
 
-  // Unprotect content - restore code blocks
-  while ((contentMatch = regex.commentCodeReplaceMarkup.exec(content)) !== null) {
-    const commentMark = contentMatch[0];
-    const originalContent = contentMatch[1] || '';
-    content = content.replace(commentMark, () => (decodeURIComponent(window.atob(originalContent))));
-  }
+  // Unprotect content
+  content = getCodeRestoredContent(content);
 
   // Put this in end of the processing pipeline, ensure docsify can render line breaks
   // by itself, rather than ignore empty lines.
